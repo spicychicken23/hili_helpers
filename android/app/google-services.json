@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342237332039",
+    "project_id": "hili-helpers",
+    "storage_bucket": "hili-helpers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342237332039:android:4499732ed4a79f4b1fa762",
+        "android_client_info": {
+          "package_name": "com.example.hili_helpers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBYZSyC-bMqGc-FFmGkeu8sNGlCGOakvo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
