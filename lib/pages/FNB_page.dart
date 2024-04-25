@@ -181,7 +181,7 @@ class _FnbPageState extends State<FnbPage> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      height: 160,
+                      height: 350,
                       child: StreamBuilder<List<fnb>>(
                         stream: fnbListsStream,
                         builder: (context, snapshot) {

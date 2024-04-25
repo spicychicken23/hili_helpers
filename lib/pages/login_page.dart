@@ -1,10 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hili_helpers/components/textfield.dart';
 import 'package:hili_helpers/components/buttons.dart';
 import 'package:hili_helpers/pages/register_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/components/auth.dart';
+import 'package:hili_helpers/pages/home_page.dart'; // Import the home page
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,29 +22,45 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerPassword = TextEditingController();
 
   Future<void> signInwithEmailAndPassword() async {
+    final String email = _controllerEmail.text.trim();
+    final String password = _controllerPassword.text;
+
+    if (!_isValidEmail(email)) {
+      setState(() {
+        errorMessage = 'Invalid email format';
+      });
+      return;
+    }
+
     try {
       await Auth().signInWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
+        email: email,
+        password: password,
+      );
+
+      // Navigate to home page upon successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message;
+        if (e.code == 'invalid-email-password') {
+          errorMessage = 'Invalid email or password';
+        } else {
+          errorMessage = e.message ?? 'An unknown error occurred.';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'An unknown error occurred.';
       });
     }
   }
 
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      await Auth().createUserWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 
   @override
@@ -59,7 +76,6 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerLeft,
                   child: BackButton(
                     onPressed: () {
-                      //Navigator.of(context).pop();
                       Navigator.pushReplacementNamed(context, FrontPage.id);
                     },
                   ),

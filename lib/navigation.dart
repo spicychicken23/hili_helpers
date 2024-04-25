@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hili_helpers/components/auth.dart';
+import 'package:hili_helpers/pages/front_page.dart'; // Import the front page
 
 class NavBar extends StatefulWidget {
-  const NavBar({super.key});
+  const NavBar({Key? key});
 
   @override
   State<NavBar> createState() => _NaviBarState();
+}
+
+Future<void> singOut(BuildContext context) async {
+  await Auth().signOut();
+  Navigator.pushReplacementNamed(
+      context, FrontPage.id); // Redirect to the front page
 }
 
 class _NaviBarState extends State<NavBar> {
@@ -21,9 +29,15 @@ class _NaviBarState extends State<NavBar> {
     return BottomNavigationBar(
       currentIndex: _currentIndex,
       onTap: (int newIndex) {
-        setState(() {
-          _currentIndex = newIndex;
-        });
+        setState(
+          () {
+            if (newIndex == 3) {
+              singOut(context); // Call signOut function with context
+            } else {
+              _currentIndex = newIndex;
+            }
+          },
+        );
       },
       selectedItemColor: const Color(0xFFD3A877),
       unselectedItemColor: const Color(0xFF595A5D),

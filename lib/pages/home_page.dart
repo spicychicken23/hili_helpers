@@ -22,27 +22,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //late List<Promo> promos = [];
   late Stream<List<Promo>> promosStream;
+  late String? userName = 'User';
 
-  /*
   @override
   void initState() {
     super.initState();
-    fetchPromos();
+    _fetchUserData();
+    promosStream = DatabaseService().getPromo();
   }
 
-  Future<void> fetchPromos() async {
-    List<Promo> promoList = await DatabaseService().getPromoData();
-    setState(() {
-      promos = promoList;
-    });
-  }
-  */
-  @override
-  void initState() {
-    super.initState();
-    promosStream = DatabaseService().getPromo() as Stream<List<Promo>>;
+  Future<void> _fetchUserData() async {
+    userName = await DatabaseService().getUsersName();
+    setState(() {}); // Update the UI after fetching user data
   }
 
   @override
@@ -52,16 +44,16 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFE4E6ED),
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const SizedBox(height: 50),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  'Welcome, Hafiz.',
-                  style: TextStyle(
+                  'Welcome, $userName.',
+                  style: const TextStyle(
                     color: Color(0xFFD3A877),
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
