@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
 import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/models/menu.dart';
-import 'package:hili_helpers/components/cart_item.dart';
+import 'package:hili_helpers/models/cart_item.dart';
 
 //const String PROMO_COLLECTION_REF = 'Promo';
 
@@ -54,13 +55,16 @@ class DatabaseService {
       Timestamp orderDate = Timestamp.now();
 
       Map<String, dynamic> data = {
+        'name': cartItem.name,
         'customer_Id': userId,
         'food_Id': cartItem.foodId,
         'shop_Id': cartItem.shopId,
+        'order_Id': orderId,
+        'subtotal': cartItem.subtotal,
         'quantity': cartItem.quantity,
         'order_date': orderDate,
         'status': 'On Going',
-        'order_id': orderId,
+        'random_id': cartItem.randomid,
       };
 
       await _firestore
@@ -116,5 +120,31 @@ class DatabaseService {
       print('User not logged in.');
     }
     return null;
+  }
+
+  Future<void> addToCartList(cart newCart) async {
+    String? userId = _auth.currentUser?.uid;
+
+    if (userId != null) {
+      String cartId = _firestore.collection('CartList').doc().id;
+
+      Map<String, dynamic> data = {
+        'customer_Id': userId,
+        'cart_Id': cartId,
+        'shop_Id': newCart.shop_Id,
+        'total': newCart.subtotal,
+        'quantity': newCart.quantity,
+        'order_date': newCart.order_date,
+        'status': newCart.status,
+        'random-Id': newCart.randomId,
+      };
+
+      await _firestore
+          .collection('CartList')
+          .doc('${cartId}_$userId')
+          .set(data);
+    } else {
+      print('Mu hacker ke? Tlg la jangan.');
+    }
   }
 }

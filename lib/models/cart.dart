@@ -1,64 +1,39 @@
 // ignore: unused_import
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hili_helpers/models/cart_item.dart';
 
 class cart {
-  String customer_Id;
-  String food_Id;
-  String order_Id;
+  List<CartItem> items;
   Timestamp order_date;
   int quantity;
   String shop_Id;
   String status;
   double subtotal;
+  int randomId;
   cart({
-    required this.customer_Id,
-    required this.food_Id,
-    required this.order_Id,
+    required this.items,
     required this.order_date,
     required this.quantity,
     required this.shop_Id,
     required this.status,
     required this.subtotal,
+    required this.randomId,
   });
 
   cart.fromJson(Map<String, Object?> json)
       : this(
-          customer_Id: json['customer_Id']! as String,
-          food_Id: json['food_Id']! as String,
-          order_Id: json['order_Id']! as String,
+          items: json['items']! as List<CartItem>,
           order_date: json['order_date']! as Timestamp,
           quantity: json['quantity']! as int,
           shop_Id: json['shop_Id']! as String,
           status: json['status']! as String,
           subtotal: json['subtotal']! as double,
+          randomId: json['random_id']! as int,
         );
-
-  cart copyWith({
-    String? customer_Id,
-    String? food_Id,
-    String? order_Id,
-    Timestamp? order_date,
-    int? quantity,
-    String? shop_Id,
-    String? status,
-    double? subtotal,
-  }) {
-    return cart(
-        customer_Id: customer_Id ?? this.customer_Id,
-        food_Id: food_Id ?? this.food_Id,
-        order_Id: order_Id ?? this.order_Id,
-        order_date: order_date ?? this.order_date,
-        quantity: quantity ?? this.quantity,
-        shop_Id: shop_Id ?? this.shop_Id,
-        status: status ?? this.status,
-        subtotal: subtotal ?? this.subtotal);
-  }
 
   Map<String, dynamic> toJson() {
     return {
-      'customer_Id': customer_Id,
-      'food_Id': food_Id,
-      'order_Id': order_Id,
+      'items': items,
       'order_date': order_date,
       'quantity': quantity,
       'shop_Id': shop_Id,
