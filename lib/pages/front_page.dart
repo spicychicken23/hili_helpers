@@ -17,10 +17,6 @@ class FrontPage extends StatelessWidget {
               child: Column(children: [
             const SizedBox(height: 50),
             const Logo(imagePath: 'lib/images/Logo Circular.png'),
-            /*Icon(
-              Icons.lock,
-              size: 100,
-            ),*/
             const SizedBox(height: 50),
             const Text(
               'Access essential\n services with us.',

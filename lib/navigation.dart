@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/auth.dart';
-import 'package:hili_helpers/pages/front_page.dart'; // Import the front page
+import 'package:hili_helpers/pages/ACT_page.dart';
+import 'package:hili_helpers/pages/front_page.dart';
+import 'package:hili_helpers/pages/home_page.dart'; // Import the front page
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key});
@@ -11,8 +13,7 @@ class NavBar extends StatefulWidget {
 
 Future<void> singOut(BuildContext context) async {
   await Auth().signOut();
-  Navigator.pushReplacementNamed(
-      context, FrontPage.id); // Redirect to the front page
+  Navigator.pushReplacementNamed(context, FrontPage.id);
 }
 
 class _NaviBarState extends State<NavBar> {
@@ -31,8 +32,17 @@ class _NaviBarState extends State<NavBar> {
       onTap: (int newIndex) {
         setState(
           () {
-            if (newIndex == 3) {
-              singOut(context); // Call signOut function with context
+            _currentIndex = newIndex;
+            if (newIndex == 0) {
+              Navigator.pushNamed(context, HomePage.id);
+            } else if (newIndex == 3) {
+              singOut(context);
+            } else if (newIndex == 1) {
+              Navigator.pushNamed(context, ActPage.id).then((_) {
+                setState(() {
+                  _currentIndex = newIndex;
+                });
+              });
             } else {
               _currentIndex = newIndex;
             }

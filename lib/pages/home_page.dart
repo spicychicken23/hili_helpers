@@ -9,6 +9,7 @@ import 'package:hili_helpers/services/database_service.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
+  static String id = 'HomePage';
 
   final User? user = Auth().currentUser;
 
@@ -50,16 +51,16 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               const SizedBox(height: 50),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: Text(
                   'Welcome, $userName.',
                   style: const TextStyle(
                     color: Color(0xFFD3A877),
-                    fontSize: 30,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'DM Sans',
                   ),
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.left,
                 ),
               ),
               const SizedBox(height: 25),

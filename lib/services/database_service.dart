@@ -15,11 +15,13 @@ class DatabaseService {
   late final CollectionReference _promoRef;
   late final CollectionReference _fnbListsRef;
   late final CollectionReference _menuListsRef;
+  late final CollectionReference _cartListsRef;
 
   DatabaseService() {
     _promoRef = _firestore.collection('Promo');
     _fnbListsRef = _firestore.collection('fnbLists');
     _menuListsRef = _firestore.collection('Menu');
+    _cartListsRef = _firestore.collection('CartList');
   }
 
   Stream<List<Promo>> getPromo() {
@@ -51,21 +53,9 @@ class DatabaseService {
 
     if (userId != null) {
       String orderId = _firestore.collection('Cart').doc().id;
-
       Timestamp orderDate = Timestamp.now();
 
-      Map<String, dynamic> data = {
-        'name': cartItem.name,
-        'customer_Id': userId,
-        'food_Id': cartItem.foodId,
-        'shop_Id': cartItem.shopId,
-        'order_Id': orderId,
-        'subtotal': cartItem.subtotal,
-        'quantity': cartItem.quantity,
-        'order_date': orderDate,
-        'status': 'On Going',
-        'random_id': cartItem.randomid,
-      };
+      Map<String, dynamic> data = cartItem.toMap(userId, orderId, orderDate);
 
       await _firestore
           .collection('Cart')
@@ -93,6 +83,7 @@ class DatabaseService {
     String? userId = _auth.currentUser?.uid;
     if (userId != null) {
       try {
+        print("User ID is: " + userId);
         DocumentSnapshot userSnapshot =
             await _firestore.collection('users').doc(userId).get();
 
@@ -145,6 +136,48 @@ class DatabaseService {
           .set(data);
     } else {
       print('Mu hacker ke? Tlg la jangan.');
+    }
+  }
+
+  Stream<List<cart>> getCartCom() {
+    return _cartListsRef
+        .where('customer_Id', isEqualTo: _auth.currentUser?.uid)
+        .where('status', isEqualTo: 'Completed')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              return cart.fromJson(doc.data() as Map<String, dynamic>);
+            }).toList());
+  }
+
+  Stream<List<cart>> getCartAct() {
+    return _cartListsRef
+        .where('customer_Id', isEqualTo: _auth.currentUser?.uid)
+        .where('status', isEqualTo: 'On Going')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              return cart.fromJson(doc.data() as Map<String, dynamic>);
+            }).toList());
+  }
+
+  Future<String?> getShopName(String shopId) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _fnbListsRef.where('ID', isEqualTo: shopId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var shopData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String? shopName = shopData['Name'] as String?;
+        if (shopName != null) {
+          return shopName;
+        }
+      } else {
+        print('No shop found with ID: $shopId');
+      }
+
+      return 'Shop Name Not Found';
+    } catch (error) {
+      print('Error fetching shop data: $error');
+      throw error;
     }
   }
 }

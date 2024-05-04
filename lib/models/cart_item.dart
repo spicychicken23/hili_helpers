@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CartItem {
   final String name;
   final String foodId;
@@ -15,5 +17,19 @@ class CartItem {
     required this.subtotal,
   });
 
-  static fromJson(item) {}
+  Map<String, dynamic> toMap(
+      String userId, String orderId, Timestamp orderDate) {
+    return {
+      'name': name,
+      'customer_Id': userId,
+      'food_Id': foodId,
+      'shop_Id': shopId,
+      'order_Id': orderId,
+      'subtotal': subtotal,
+      'quantity': quantity,
+      'order_date': orderDate,
+      'status': 'On Going',
+      'random_id': randomid,
+    };
+  }
 }

@@ -31,7 +31,6 @@ class fnbListing extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              // ignore: unnecessary_null_comparison
               leading: ClipOval(
                 child: Image.network(
                   fnbs.Icon,
@@ -84,11 +83,13 @@ class menuListing extends StatelessWidget {
     required this.menu,
     required this.shopId,
     required this.randomId,
+    required this.updateTotalQuantity,
   }) : super(key: key);
 
   final Menu menu;
   final String shopId;
   final int randomId;
+  final Function(int, bool) updateTotalQuantity;
 
   @override
   Widget build(BuildContext context) {
@@ -135,11 +136,13 @@ class menuListing extends StatelessWidget {
                     width: 70,
                     height: 30,
                     child: Quantity(
-                        name: menu.Name,
-                        food_id: menu.ID,
-                        shop_id: shopId,
-                        initialSubtotal: menu.Price,
-                        randomid: randomId),
+                      name: menu.Name,
+                      food_id: menu.ID,
+                      shop_id: shopId,
+                      initialSubtotal: menu.Price,
+                      randomid: randomId,
+                      updateTotalQuantity: updateTotalQuantity,
+                    ),
                   ),
                   const SizedBox(
                     height: 5,
@@ -170,7 +173,8 @@ class Quantity extends StatefulWidget {
       required this.initialSubtotal,
       required this.food_id,
       required this.shop_id,
-      required this.randomid})
+      required this.randomid,
+      required this.updateTotalQuantity})
       : super(key: key);
 
   final int initialQuantity;
@@ -179,6 +183,7 @@ class Quantity extends StatefulWidget {
   final String food_id;
   final String shop_id;
   final int randomid;
+  final Function(int, bool) updateTotalQuantity;
 
   @override
   _QuantityState createState() => _QuantityState();
@@ -202,6 +207,7 @@ class _QuantityState extends State<Quantity> {
       _subtotal += widget.initialSubtotal;
       _quantity++;
       _updateCart();
+      widget.updateTotalQuantity(1, true);
     });
   }
 
@@ -211,6 +217,7 @@ class _QuantityState extends State<Quantity> {
         _subtotal -= widget.initialSubtotal;
         _quantity--;
         _updateCart();
+        widget.updateTotalQuantity(1, false);
       }
     });
   }
@@ -472,6 +479,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _confirmOrder();
+          Navigator.of(context).popUntil((route) => route.isFirst);
         },
         backgroundColor: const Color(0xFF5CB85C),
         foregroundColor: const Color(0xFFFFFFFF),

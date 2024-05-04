@@ -10,6 +10,7 @@ class cart {
   String status;
   double subtotal;
   int randomId;
+
   cart({
     required this.items,
     required this.order_date,
@@ -20,25 +21,27 @@ class cart {
     required this.randomId,
   });
 
-  cart.fromJson(Map<String, Object?> json)
+  cart.fromJson(Map<String, dynamic> json)
       : this(
-          items: json['items']! as List<CartItem>,
-          order_date: json['order_date']! as Timestamp,
-          quantity: json['quantity']! as int,
-          shop_Id: json['shop_Id']! as String,
-          status: json['status']! as String,
-          subtotal: json['subtotal']! as double,
-          randomId: json['random_id']! as int,
+          items: [], // Initialize items as an empty list since there's no direct mapping
+          order_date: json['order_date'] as Timestamp,
+          quantity: json['quantity'] as int,
+          shop_Id: json['shop_Id'] as String,
+          status: json['status'] as String,
+          subtotal: json['total']
+              as double, // Changed 'total' to 'subtotal' to match the JSON structure
+          randomId: json['random-Id'] as int, // Adjusted to match the JSON key
         );
 
   Map<String, dynamic> toJson() {
     return {
-      'items': items,
+      // Since there's no direct mapping for 'items', it won't be included here
       'order_date': order_date,
       'quantity': quantity,
       'shop_Id': shop_Id,
       'status': status,
-      'subtotal': subtotal
+      'subtotal': subtotal, // Changed 'subtotal' to match the JSON key
+      'random-Id': randomId, // Adjusted to match the JSON key
     };
   }
 }
