@@ -7,6 +7,7 @@ import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/pages/FNB_Details_page.dart';
 import 'package:hili_helpers/models/cart_item.dart';
+import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 // ignore: camel_case_types
@@ -479,7 +480,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _confirmOrder();
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.of(context).pop();
         },
         backgroundColor: const Color(0xFF5CB85C),
         foregroundColor: const Color(0xFFFFFFFF),
