@@ -1,5 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/buttons.dart';
+import 'package:hili_helpers/components/fnb.dart';
 import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/components/displays.dart';
 import 'package:hili_helpers/services/database_service.dart';
@@ -15,11 +17,20 @@ class NextPage extends StatefulWidget {
 
 class _NextPageState extends State<NextPage> {
   late Stream<List<Menu>> menuListsStream;
+  late int _randomId;
+  int _totalQuantity = 0;
 
   @override
   void initState() {
     super.initState();
+    _randomId = Random().nextInt(1000000000);
     menuListsStream = DatabaseService().getMenuLists() as Stream<List<Menu>>;
+  }
+
+  void updateTotalQuantity(int newQuantity, bool status) {
+    setState(() {
+      status ? _totalQuantity += newQuantity : _totalQuantity -= newQuantity;
+    });
   }
 
   @override
@@ -107,6 +118,8 @@ class _NextPageState extends State<NextPage> {
                                 itemBuilder: (context, index) => menuListing(
                                   menu: menuLists[index],
                                   shopId: widget.Fnb.ID,
+                                  randomId: _randomId,
+                                  updateTotalQuantity: updateTotalQuantity,
                                 ),
                               );
                             }
@@ -210,6 +223,26 @@ class _NextPageState extends State<NextPage> {
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _totalQuantity > 0
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ConfirmOrder(
+                      shop_Id: widget.Fnb.ID,
+                      random_Id: _randomId,
+                    ),
+                  ),
+                );
+                print(_totalQuantity);
+              },
+              backgroundColor: const Color(0xFFCCA67B),
+              foregroundColor: const Color(0xFF000000),
+              label: const Text("Proceed"),
+            )
+          : null,
     );
   }
 }

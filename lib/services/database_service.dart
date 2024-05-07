@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
 import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/models/menu.dart';
-import 'package:hili_helpers/components/cart_item.dart';
+import 'package:hili_helpers/models/cart_item.dart';
 
 //const String PROMO_COLLECTION_REF = 'Promo';
 
@@ -14,11 +15,13 @@ class DatabaseService {
   late final CollectionReference _promoRef;
   late final CollectionReference _fnbListsRef;
   late final CollectionReference _menuListsRef;
+  late final CollectionReference _cartListsRef;
 
   DatabaseService() {
     _promoRef = _firestore.collection('Promo');
     _fnbListsRef = _firestore.collection('fnbLists');
     _menuListsRef = _firestore.collection('Menu');
+    _cartListsRef = _firestore.collection('CartList');
   }
 
   Stream<List<Promo>> getPromo() {
@@ -50,18 +53,9 @@ class DatabaseService {
 
     if (userId != null) {
       String orderId = _firestore.collection('Cart').doc().id;
-
       Timestamp orderDate = Timestamp.now();
 
-      Map<String, dynamic> data = {
-        'customer_Id': userId,
-        'food_Id': cartItem.foodId,
-        'shop_Id': cartItem.shopId,
-        'quantity': cartItem.quantity,
-        'order_date': orderDate,
-        'status': 'On Going',
-        'order_id': orderId,
-      };
+      Map<String, dynamic> data = cartItem.toMap(userId, orderId, orderDate);
 
       await _firestore
           .collection('Cart')
@@ -89,6 +83,7 @@ class DatabaseService {
     String? userId = _auth.currentUser?.uid;
     if (userId != null) {
       try {
+        print("User ID is: " + userId);
         DocumentSnapshot userSnapshot =
             await _firestore.collection('users').doc(userId).get();
 
@@ -116,5 +111,73 @@ class DatabaseService {
       print('User not logged in.');
     }
     return null;
+  }
+
+  Future<void> addToCartList(cart newCart) async {
+    String? userId = _auth.currentUser?.uid;
+
+    if (userId != null) {
+      String cartId = _firestore.collection('CartList').doc().id;
+
+      Map<String, dynamic> data = {
+        'customer_Id': userId,
+        'cart_Id': cartId,
+        'shop_Id': newCart.shop_Id,
+        'total': newCart.subtotal,
+        'quantity': newCart.quantity,
+        'order_date': newCart.order_date,
+        'status': newCart.status,
+        'random-Id': newCart.randomId,
+      };
+
+      await _firestore
+          .collection('CartList')
+          .doc('${cartId}_$userId')
+          .set(data);
+    } else {
+      print('Mu hacker ke? Tlg la jangan.');
+    }
+  }
+
+  Stream<List<cart>> getCartCom() {
+    return _cartListsRef
+        .where('customer_Id', isEqualTo: _auth.currentUser?.uid)
+        .where('status', isEqualTo: 'Completed')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              return cart.fromJson(doc.data() as Map<String, dynamic>);
+            }).toList());
+  }
+
+  Stream<List<cart>> getCartAct() {
+    return _cartListsRef
+        .where('customer_Id', isEqualTo: _auth.currentUser?.uid)
+        .where('status', isEqualTo: 'On Going')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              return cart.fromJson(doc.data() as Map<String, dynamic>);
+            }).toList());
+  }
+
+  Future<String?> getShopName(String shopId) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _fnbListsRef.where('ID', isEqualTo: shopId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var shopData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String? shopName = shopData['Name'] as String?;
+        if (shopName != null) {
+          return shopName;
+        }
+      } else {
+        print('No shop found with ID: $shopId');
+      }
+
+      return 'Shop Name Not Found';
+    } catch (error) {
+      print('Error fetching shop data: $error');
+      throw error;
+    }
   }
 }

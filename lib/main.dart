@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/widget_tree.dart';
 import 'package:hili_helpers/pages/FNB_page.dart';
+import 'package:hili_helpers/pages/ACT_page.dart';
+import 'package:hili_helpers/pages/home_page.dart';
 import 'pages/front_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
@@ -28,6 +30,8 @@ class MyApp extends StatelessWidget {
         LoginPage.id: (context) => const LoginPage(),
         RegisterPage.id: (context) => RegisterPage(),
         FnbPage.id: (context) => FnbPage(),
+        ActPage.id: (context) => ActPage(),
+        HomePage.id: (context) => HomePage(),
       },
     ); // MaterialApp
   }

@@ -1,11 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
-import 'package:hili_helpers/models/fnbLists.dart';
-import 'package:hili_helpers/models/menu.dart';
-import 'package:hili_helpers/pages/FNB_Details_page.dart';
-import 'package:hili_helpers/components/cart_item.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class CustomButton extends StatelessWidget {
@@ -88,6 +86,60 @@ Widget accBtn(String image, BuildContext context, String nextPageId) {
   );
 }
 
+Widget serviceIcon(String image, BuildContext context, String nextPageId) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.pushNamed(context, nextPageId);
+    },
+    child: Column(
+      children: [
+        Container(
+          height: 80,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              margin: const EdgeInsets.only(right: 15.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(image),
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomRight,
+                    stops: const [0.1, 0.9],
+                    colors: [
+                      const Color(0xFF0C171D).withOpacity(.4),
+                      const Color(0xFF0C171D).withOpacity(.1),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 2),
+        const Padding(
+          padding: EdgeInsets.only(right: 15),
+          child: Text(
+            "text",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Widget allBtn(IconData icon, String label, VoidCallback onPressed) {
   return InkWell(
     onTap: () {},
@@ -105,19 +157,12 @@ Widget allBtn(IconData icon, String label, VoidCallback onPressed) {
           ),
         ),
         const SizedBox(height: 8),
-        /* 
-          Text(
-            label,
-            style: TextStyle(color: Colors.blue),
-          ),
-          */
       ],
     ),
   );
 }
 
 class NewsPromo extends StatelessWidget {
-  //const NewsPromo({super.key});
   const NewsPromo({super.key, required this.promo});
   final Promo promo;
 
@@ -128,7 +173,8 @@ class NewsPromo extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            leading: const CircleAvatar(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(promo.Icon),
               radius: 25,
             ),
             title: Text(
@@ -144,7 +190,6 @@ class NewsPromo extends StatelessWidget {
                 fontSize: 8,
               ),
             ),
-            //trailing: Text('F&B'),
           ),
           const Divider(
             thickness: 1,
@@ -155,287 +200,159 @@ class NewsPromo extends StatelessWidget {
   }
 }
 
-// ignore: camel_case_types
-class fnbListing extends StatelessWidget {
-  const fnbListing({Key? key, required this.fnbs}) : super(key: key);
+class actHistory extends StatelessWidget {
+  const actHistory(
+      {Key? key, required this.order, required this.databaseService})
+      : super(key: key);
 
-  final fnb fnbs;
+  final cart order;
+  final DatabaseService databaseService;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NextPage(Fnb: fnbs),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            ListTile(
-              // ignore: unnecessary_null_comparison
-              leading: ClipOval(
-                child: Image.network(
-                  fnbs.Icon,
-                  width: 50,
-                  height: 50,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                image: DecorationImage(
+                  image: AssetImage(_getIcon(order.shop_Id)),
                   fit: BoxFit.cover,
                 ),
               ),
-              title: Text(
-                fnbs.Name,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Row(
-                children: [
-                  const Icon(
-                    Icons.star,
-                    size: 12,
-                    color: Color(0xFFD3A877),
+            ),
+            title: FutureBuilder<String?>(
+              future: databaseService.getShopName(order.shop_Id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Text(
+                  snapshot.data!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Text(
-                    fnbs.Rating.toString(),
-                    style: const TextStyle(
-                      fontSize: 8,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
-                ],
-              ),
-              trailing: Text(
-                fnbs.Category,
-                style: const TextStyle(
-                  color: Color(0xFFB3B3B3),
-                  fontFamily: 'Roboto',
-                ),
+                );
+              },
+            ),
+            subtitle: Text(
+              order.order_date.toDate().toString(),
+              style: const TextStyle(
+                fontSize: 8,
               ),
             ),
-          ],
-        ),
+            trailing: Text(
+              order.subtotal.toString(),
+              style: const TextStyle(
+                fontSize: 8,
+              ),
+            ),
+          ),
+          const Divider(
+            thickness: 1,
+          ),
+        ],
       ),
     );
   }
 }
 
-class menuListing extends StatelessWidget {
-  const menuListing({Key? key, required this.menu, required this.shopId})
+class actOnGoing extends StatelessWidget {
+  const actOnGoing(
+      {Key? key, required this.order, required this.databaseService})
       : super(key: key);
 
-  final Menu menu;
-  final String shopId;
+  final cart order;
+  final DatabaseService databaseService;
 
   @override
   Widget build(BuildContext context) {
-    if (menu.Shop_ID != shopId) {
-      return Container();
-    }
-
-    return GestureDetector(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            ListTile(
-              leading: ClipOval(
-                child: Image.network(
-                  menu.Icon,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Column(
+        children: [
+          Container(
+            height: 80,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                margin: const EdgeInsets.only(right: 15.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: AssetImage(_getIcon(order.shop_Id)),
+                  ),
                 ),
-              ),
-              title: Text(
-                menu.Name,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Row(
-                children: [
-                  Text(
-                    menu.Description,
-                    style: const TextStyle(
-                      fontSize: 8,
-                      fontFamily: 'Roboto',
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomRight,
+                      stops: const [0.1, 0.9],
+                      colors: [
+                        const Color(0xFF0C171D).withOpacity(.4),
+                        const Color(0xFF0C171D).withOpacity(.1),
+                      ],
                     ),
                   ),
-                ],
-              ),
-              trailing: Column(
-                children: [
-                  SizedBox(
-                    width: 70,
-                    height: 30,
-                    child: Quantity(
-                        food_id: menu.ID,
-                        shop_id: shopId,
-                        initialSubtotal: menu.Price),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'RM${menu.Price}',
-                    style: const TextStyle(
-                      color: Color(0xFFB3B3B3),
-                      fontSize: 10,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 2),
+          Padding(
+            padding: EdgeInsets.only(right: 15),
+            child: Text(
+              _getStatus(order.order_date),
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class Quantity extends StatefulWidget {
-  const Quantity(
-      {Key? key,
-      this.initialQuantity = 0,
-      required this.initialSubtotal,
-      required this.food_id,
-      required this.shop_id})
-      : super(key: key);
+String _getStatus(Timestamp time) {
+  Timestamp currentTime = Timestamp.now();
 
-  final int initialQuantity;
-  final double initialSubtotal;
-  final String food_id;
-  final String shop_id;
+  int differenceInSeconds = time.seconds - currentTime.seconds;
 
-  @override
-  _QuantityState createState() => _QuantityState();
+  if (differenceInSeconds <= 0) {
+    return 'On Going';
+  } else if (differenceInSeconds <= 24 * 3600) {
+    DateTime orderDateTime =
+        DateTime.fromMillisecondsSinceEpoch(time.seconds * 1000);
+    return '${orderDateTime.hour}:${orderDateTime.minute}';
+  } else {
+    DateTime orderDate =
+        DateTime.fromMillisecondsSinceEpoch(time.seconds * 1000);
+    return '${orderDate.day}/${orderDate.month}/${orderDate.year}';
+  }
 }
 
-class _QuantityState extends State<Quantity> {
-  late int _quantity;
-  late double _subtotal;
-  late DatabaseService _databaseService;
-
-  @override
-  void initState() {
-    super.initState();
-    _quantity = widget.initialQuantity;
-    _subtotal = widget.initialSubtotal;
-    _databaseService = DatabaseService();
-  }
-
-  void _incrementQuantity() {
-    setState(() {
-      _subtotal += _subtotal;
-      _quantity++;
-      _updateCart();
-    });
-  }
-
-  void _decrementQuantity() {
-    setState(() {
-      if (_quantity > 0) {
-        _subtotal -= _subtotal;
-        _quantity--;
-        _updateCart();
-      }
-    });
-  }
-
-  void _updateCart() {
-    if (_quantity > 0) {
-      final cartItem = CartItem(
-        foodId: widget.food_id,
-        shopId: widget.shop_id,
-        quantity: _quantity,
-        subtotal: _subtotal,
-      );
-      _databaseService.addToCart(cartItem);
-    } else {
-      _databaseService.deleteCartItem(widget.food_id, widget.shop_id);
-    }
-  }
-
-  @override
-  void dispose() {
-    _databaseService.deleteCartItem(widget.food_id, widget.shop_id);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (_quantity > 0)
-          SizedBox(
-            width: 25,
-            height: 25,
-            child: Center(
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFD9D9D9),
-                  borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(10),
-                  ),
-                ),
-                child: IconButton(
-                  color: const Color(0xFFD3A877),
-                  icon: const Icon(Icons.remove),
-                  iconSize: 12,
-                  onPressed: _decrementQuantity,
-                ),
-              ),
-            ),
-          ),
-        if (_quantity > 0)
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: Center(
-              child: Text(
-                '$_quantity',
-                style: const TextStyle(fontSize: 6),
-              ),
-            ),
-          ),
-        if (_quantity == 0) const SizedBox(width: 25),
-        SizedBox(
-          width: 25,
-          height: 25,
-          child: Center(
-            child: _quantity > 0
-                ? DecoratedBox(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFD9D9D9),
-                      borderRadius: BorderRadius.horizontal(
-                        right: Radius.circular(10),
-                      ),
-                    ),
-                    child: IconButton(
-                      color: Color(0xFFD3A877),
-                      icon: Icon(Icons.add),
-                      iconSize: 12,
-                      onPressed: _incrementQuantity,
-                    ),
-                  )
-                : IconButton(
-                    color: Color(0xFFD3A877),
-                    icon: Icon(Icons.add),
-                    iconSize: 12,
-                    onPressed: _incrementQuantity,
-                  ),
-          ),
-        ),
-      ],
-    );
+String _getIcon(String shopId) {
+  if (shopId.startsWith('F')) {
+    return 'lib/images/FNB ICON.png';
+  } else if (shopId.startsWith('D')) {
+    return 'lib/images/DOM ICON.png';
+  } else if (shopId.startsWith('V')) {
+    return 'lib/images/VEH ICON.png';
+  } else {
+    return 'lib/images/EDU ICON.png';
   }
 }
