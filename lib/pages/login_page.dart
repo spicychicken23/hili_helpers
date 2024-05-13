@@ -6,6 +6,7 @@ import 'package:hili_helpers/pages/register_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/pages/home_page.dart'; // Import the home page
+import 'package:hili_helpers/pages/forgot_password.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -63,6 +64,13 @@ class _LoginPageState extends State<LoginPage> {
     return emailRegex.hasMatch(email);
   }
 
+  void _goToForgotPasswordPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,24 +121,38 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _controllerEmail,
                   hintText: 'Email',
                   obscureText: false,
+                  onChanged: (value) {},
+                  validator: (value) {
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 10),
                 MyTextField(
                   controller: _controllerPassword,
                   hintText: 'Password',
                   obscureText: true,
+                  onChanged: (value) {},
+                  validator: (value) {
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Color(0xFF828282)),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: _goToForgotPasswordPage,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 25),
