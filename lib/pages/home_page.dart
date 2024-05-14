@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hili_helpers/components/buttons.dart';
+import 'package:hili_helpers/components/home.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/models/promo.dart';
@@ -305,7 +305,7 @@ class _HomePageState extends State<HomePage> {
                             return ListView.builder(
                               itemCount: promos.length,
                               itemBuilder: (context, index) =>
-                                  NewsPromo(promo: promos[index]),
+                                  NewsPromo(promo: promos[index], ),
                             );
                           }
                         },

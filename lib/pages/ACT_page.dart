@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/buttons.dart';
+import 'package:hili_helpers/components/activity.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/services/database_service.dart';

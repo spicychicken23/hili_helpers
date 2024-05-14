@@ -3,19 +3,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/fnb.dart';
 import 'package:hili_helpers/models/fnbLists.dart';
-import 'package:hili_helpers/components/displays.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import '../models/menu.dart';
 
-class NextPage extends StatefulWidget {
+class FnbDetailsPage extends StatefulWidget {
   final fnb Fnb;
-  NextPage({Key? key, required this.Fnb}) : super(key: key);
+  FnbDetailsPage({Key? key, required this.Fnb}) : super(key: key);
 
   @override
-  _NextPageState createState() => _NextPageState();
+  _FnbDetailsPageState createState() => _FnbDetailsPageState();
 }
 
-class _NextPageState extends State<NextPage> {
+class _FnbDetailsPageState extends State<FnbDetailsPage> {
   late Stream<List<Menu>> menuListsStream;
   late int _randomId;
   int _totalQuantity = 0;
@@ -180,16 +179,11 @@ class _NextPageState extends State<NextPage> {
                       ),
                       Column(
                         children: [
-                          buildProgressBar(
-                              '5', widget.Fnb.Rate_5 / widget.Fnb.Raters),
-                          buildProgressBar(
-                              '4', widget.Fnb.Rate_4 / widget.Fnb.Raters),
-                          buildProgressBar(
-                              '3', widget.Fnb.Rate_3 / widget.Fnb.Raters),
-                          buildProgressBar(
-                              '2', widget.Fnb.Rate_2 / widget.Fnb.Raters),
-                          buildProgressBar(
-                              '1', widget.Fnb.Rate_1 / widget.Fnb.Raters),
+                          ratingBar('5', widget.Fnb.Rate_5 / widget.Fnb.Raters),
+                          ratingBar('4', widget.Fnb.Rate_4 / widget.Fnb.Raters),
+                          ratingBar('3', widget.Fnb.Rate_3 / widget.Fnb.Raters),
+                          ratingBar('2', widget.Fnb.Rate_2 / widget.Fnb.Raters),
+                          ratingBar('1', widget.Fnb.Rate_1 / widget.Fnb.Raters),
                         ],
                       ),
                       const SizedBox(

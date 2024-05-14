@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/buttons.dart';
-import 'package:hili_helpers/components/square_tile.dart';
+import 'package:hili_helpers/components/front.dart';
 import 'package:hili_helpers/pages/login_page.dart';
 import 'package:hili_helpers/pages/register_page.dart';
 

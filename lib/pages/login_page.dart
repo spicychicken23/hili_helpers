@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hili_helpers/components/textfield.dart';
-import 'package:hili_helpers/components/buttons.dart';
+import 'package:hili_helpers/components/front.dart';
 import 'package:hili_helpers/pages/register_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/components/auth.dart';
@@ -124,13 +123,13 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 16,
                   ),
                 ),
-                MyTextField(
+                InputField(
                   controller: _controllerEmail,
                   hintText: 'Email',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
-                MyTextField(
+                InputField(
                   controller: _controllerPassword,
                   hintText: 'Password',
                   obscureText: true,

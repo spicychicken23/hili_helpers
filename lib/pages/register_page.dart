@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/textfield.dart';
-import 'package:hili_helpers/components/buttons.dart';
+import 'package:hili_helpers/components/front.dart';
 import 'package:hili_helpers/pages/login_page.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -52,19 +51,19 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50),
-                MyTextField(
+                InputField(
                   controller: usernameController,
                   hintText: 'Username',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
-                MyTextField(
+                InputField(
                   controller: emailController,
                   hintText: 'Email Address',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
-                MyTextField(
+                InputField(
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,

@@ -6,8 +6,6 @@ import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/models/cart_item.dart';
 
-//const String PROMO_COLLECTION_REF = 'Promo';
-
 class DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -178,6 +176,26 @@ class DatabaseService {
     } catch (error) {
       print('Error fetching shop data: $error');
       throw error;
+    }
+  }
+
+  Future<fnb?> fetchFnbByShopId(String shopId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('fnb')
+          .where('ID', isEqualTo: shopId)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        return fnb.fromJson(doc.data() as Map<String, Object?>);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching fnb: $e');
+      return null;
     }
   }
 }

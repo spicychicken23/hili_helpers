@@ -7,7 +7,6 @@ import 'package:hili_helpers/models/fnbLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/pages/FNB_Details_page.dart';
 import 'package:hili_helpers/models/cart_item.dart';
-import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 // ignore: camel_case_types
@@ -23,7 +22,7 @@ class fnbListing extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NextPage(Fnb: fnbs),
+            builder: (context) => FnbDetailsPage(Fnb: fnbs),
           ),
         );
       },
@@ -491,4 +490,32 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
       ),
     );
   }
+}
+
+Widget ratingBar(String label, double value) {
+  return Row(
+    children: [
+      Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontFamily: 'DM Sans',
+        ),
+      ),
+      const SizedBox(width: 8),
+      SizedBox(
+        height: 5,
+        width: 100,
+        child: LinearProgressIndicator(
+          value: value,
+          backgroundColor: Colors.grey[300],
+          valueColor: const AlwaysStoppedAnimation<Color>(
+            Color(0xFFD3A877),
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+    ],
+  );
 }
