@@ -23,6 +23,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   late Stream<List<Promo>> promosStream;
   late String? userName = 'User';
 
@@ -310,7 +318,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: const NavBar(),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: _currentIndex,
+        onPageChanged: _onPageChanged,
+      ),
     );
   }
 }
+
+final List<Widget> pages = [
+  Center(child: Text('Your Home Page')),
+  Center(child: Text('Your Notifications Page')),
+  Center(child: Text('Your Messages Page')),
+];

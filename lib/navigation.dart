@@ -2,52 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/pages/ACT_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
-import 'package:hili_helpers/pages/home_page.dart'; // Import the front page
+import 'package:hili_helpers/pages/home_page.dart';
 
-class NavBar extends StatefulWidget {
-  const NavBar({Key? key});
+typedef OnPageChangedCallback = void Function(int);
 
-  @override
-  State<NavBar> createState() => _NaviBarState();
-}
+class CustomNavigationBar extends StatelessWidget {
+  Future<void> singOut(BuildContext context) async {
+    await Auth().signOut();
+    Navigator.pushReplacementNamed(context, FrontPage.id);
+  }
 
-Future<void> singOut(BuildContext context) async {
-  await Auth().signOut();
-  Navigator.pushReplacementNamed(context, FrontPage.id);
-}
+  final int currentIndex;
+  final OnPageChangedCallback onPageChanged;
 
-class _NaviBarState extends State<NavBar> {
-  int _currentIndex = 0;
-  List<Widget> body = const [
-    Icon(Icons.home),
-    Icon(Icons.library_books),
-    Icon(Icons.notifications),
-    Icon(Icons.person),
-  ];
+  const CustomNavigationBar({
+    Key? key,
+    required this.currentIndex,
+    required this.onPageChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (int newIndex) {
-        setState(
-          () {
-            _currentIndex = newIndex;
-            if (newIndex == 0) {
-              Navigator.pushNamed(context, HomePage.id);
-            } else if (newIndex == 3) {
-              singOut(context);
-            } else if (newIndex == 1) {
-              Navigator.pushNamed(context, ActPage.id).then((_) {
-                setState(() {
-                  _currentIndex = newIndex;
-                });
-              });
-            } else {
-              _currentIndex = newIndex;
-            }
-          },
-        );
+      currentIndex: currentIndex,
+      onTap: (index) {
+        switch (index) {
+          case 0:
+            Navigator.pushNamed(context, HomePage.id);
+            break;
+          case 1:
+            Navigator.pushNamed(context, ActPage.id);
+            break;
+          case 2:
+            break;
+          case 3:
+            singOut(context);
+            break;
+        }
+        onPageChanged(index);
       },
       selectedItemColor: const Color(0xFFD3A877),
       unselectedItemColor: const Color(0xFF595A5D),
@@ -58,7 +50,6 @@ class _NaviBarState extends State<NavBar> {
         BottomNavigationBarItem(
           label: 'Home',
           icon: Icon(Icons.home),
-          backgroundColor: Color(0xFFDEE1E8),
         ),
         BottomNavigationBarItem(
           label: 'Activity',
