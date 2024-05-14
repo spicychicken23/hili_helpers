@@ -21,14 +21,23 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInwithEmailAndPassword() async {
+  @override
+  void dispose() {
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
+    super.dispose();
+  }
+
+  Future<void> signInWithEmailAndPassword() async {
     final String email = _controllerEmail.text.trim();
     final String password = _controllerPassword.text;
 
     if (!_isValidEmail(email)) {
-      setState(() {
-        errorMessage = 'Invalid email format';
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Invalid email format';
+        });
+      }
       return;
     }
 
@@ -39,22 +48,28 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // Navigate to home page upon successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        if (e.code == 'invalid-email-password') {
-          errorMessage = 'Invalid email or password';
-        } else {
-          errorMessage = e.message ?? 'An unknown error occurred.';
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (e.code == 'invalid-email-password') {
+            errorMessage = 'Invalid email or password';
+          } else {
+            errorMessage = e.message ?? 'An unknown error occurred.';
+          }
+        });
+      }
     } catch (e) {
-      setState(() {
-        errorMessage = 'An unknown error occurred.';
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'An unknown error occurred.';
+        });
+      }
     }
   }
 
@@ -139,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: CustomButton(
                     buttonText: 'Login',
                     onPressed: () {
-                      signInwithEmailAndPassword();
+                      signInWithEmailAndPassword();
                     },
                   ),
                 ),

@@ -13,13 +13,20 @@ class ActPage extends StatefulWidget {
 }
 
 class _ActPageState extends State<ActPage> {
+  int _currentIndex = 1;
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   late Stream<List<cart>> completedStream;
   late Stream<List<cart>> onGoingStream;
 
   @override
   void initState() {
     super.initState();
-    //promosStream = DatabaseService().getPromo();
     completedStream = DatabaseService().getCartCom();
     onGoingStream = DatabaseService().getCartAct();
   }
@@ -138,7 +145,10 @@ class _ActPageState extends State<ActPage> {
           ),
         ),
       ),
-      bottomNavigationBar: const NavBar(),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: _currentIndex,
+        onPageChanged: _onPageChanged,
+      ),
     );
   }
 }

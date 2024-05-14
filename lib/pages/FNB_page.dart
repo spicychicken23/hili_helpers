@@ -17,7 +17,7 @@ class _FnbPageState extends State<FnbPage> {
   @override
   void initState() {
     super.initState();
-    fnbListsStream = DatabaseService().getFnbLists() as Stream<List<fnb>>;
+    fnbListsStream = DatabaseService().getFnbLists();
   }
 
   @override

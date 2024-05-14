@@ -480,7 +480,10 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _confirmOrder();
-          Navigator.of(context).pop();
+          int count = 0;
+          Navigator.popUntil(context, (route) {
+            return count++ == 3;
+          });
         },
         backgroundColor: const Color(0xFF5CB85C),
         foregroundColor: const Color(0xFFFFFFFF),
