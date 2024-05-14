@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   late Stream<List<Promo>> promosStream;
   late String? userName = 'User';
+  late String? userStatus = 'User';
 
   @override
   void initState() {
@@ -43,7 +44,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _fetchUserData() async {
     userName = await DatabaseService().getUsersName();
-    setState(() {}); // Update the UI after fetching user data
+    userStatus = await DatabaseService().getStatus();
+    setState(() {});
   }
 
   @override
@@ -304,8 +306,9 @@ class _HomePageState extends State<HomePage> {
                             List<Promo> promos = snapshot.data!;
                             return ListView.builder(
                               itemCount: promos.length,
-                              itemBuilder: (context, index) =>
-                                  NewsPromo(promo: promos[index], ),
+                              itemBuilder: (context, index) => NewsPromo(
+                                promo: promos[index],
+                              ),
                             );
                           }
                         },
@@ -319,6 +322,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: CustomNavigationBar(
+        userStatus: userStatus,
         currentIndex: _currentIndex,
         onPageChanged: _onPageChanged,
       ),

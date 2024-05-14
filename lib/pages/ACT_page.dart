@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/activity.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/navigation.dart';
+import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class ActPage extends StatefulWidget {
@@ -23,12 +24,19 @@ class _ActPageState extends State<ActPage> {
 
   late Stream<List<cart>> completedStream;
   late Stream<List<cart>> onGoingStream;
+  late String? userStatus = 'User';
 
   @override
   void initState() {
     super.initState();
     completedStream = DatabaseService().getCartCom();
     onGoingStream = DatabaseService().getCartAct();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    userStatus = await DatabaseService().getStatus();
+    setState(() {});
   }
 
   @override
@@ -53,7 +61,8 @@ class _ActPageState extends State<ActPage> {
                       children: <Widget>[
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.popUntil(
+                                context, ModalRoute.withName(HomePage.id));
                           },
                           child: const Icon(Icons.chevron_left),
                         ),
@@ -146,6 +155,7 @@ class _ActPageState extends State<ActPage> {
         ),
       ),
       bottomNavigationBar: CustomNavigationBar(
+        userStatus: userStatus,
         currentIndex: _currentIndex,
         onPageChanged: _onPageChanged,
       ),
