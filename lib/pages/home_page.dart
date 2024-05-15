@@ -4,7 +4,10 @@ import 'package:hili_helpers/components/home.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/models/promo.dart';
+import 'package:hili_helpers/pages/DOM_page.dart';
+import 'package:hili_helpers/pages/EDU_page.dart';
 import 'package:hili_helpers/pages/FNB_page.dart';
+import 'package:hili_helpers/pages/VEH_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -222,13 +225,16 @@ class _HomePageState extends State<HomePage> {
                                                   context, FnbPage.id);
                                             }),
                                             allBtn(Icons.school, 'EDU', () {
-                                              print('EDU button pressed');
+                                              Navigator.pushNamed(
+                                                  context, EduPage.id);
                                             }),
                                             allBtn(Icons.build, 'DOM', () {
-                                              print('DOM button pressed');
+                                              Navigator.pushNamed(
+                                                  context, DomPage.id);
                                             }),
                                             allBtn(Icons.drive_eta, 'VEH', () {
-                                              print('VEH button pressed');
+                                              Navigator.pushNamed(
+                                                  context, VehPage.id);
                                             }),
                                           ],
                                         ),
@@ -265,9 +271,9 @@ class _HomePageState extends State<HomePage> {
                         scrollDirection: Axis.horizontal,
                         children: <Widget>[
                           accBtn('lib/images/FNB.png', context, FnbPage.id),
-                          accBtn('lib/images/EDU.png', context, FnbPage.id),
-                          accBtn('lib/images/DOM.png', context, FnbPage.id),
-                          accBtn('lib/images/VEH.png', context, FnbPage.id),
+                          accBtn('lib/images/EDU.png', context, EduPage.id),
+                          accBtn('lib/images/DOM.png', context, DomPage.id),
+                          accBtn('lib/images/VEH.png', context, VehPage.id),
                         ],
                       ),
                     ),
@@ -329,9 +335,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-final List<Widget> pages = [
-  Center(child: Text('Your Home Page')),
-  Center(child: Text('Your Notifications Page')),
-  Center(child: Text('Your Messages Page')),
-];

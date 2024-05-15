@@ -7,6 +7,7 @@ import 'package:hili_helpers/pages/home_page.dart';
 
 typedef OnPageChangedCallback = void Function(int);
 
+// ignore: must_be_immutable
 class CustomNavigationBar extends StatelessWidget {
   String? userStatus = 'User';
   Future<void> singOut(BuildContext context) async {

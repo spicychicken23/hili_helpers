@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hili_helpers/components/helper.dart';
@@ -96,7 +97,7 @@ class _HelperPageState extends State<HelperPage> {
               const SizedBox(
                 height: 10,
               ),
-              HelperNaviBar(),
+              const HelperNaviBar(),
               const SizedBox(
                 height: 20,
               ),
@@ -163,7 +164,9 @@ class _HelperPageState extends State<HelperPage> {
                                 bottomRight: Radius.circular(50.0)),
                           ),
                         ),
-                        onPressed: () => _selectDate(context),
+                        onPressed: _dropdownValue == 'All'
+                            ? null
+                            : () => _selectDate(context),
                         child: const Text(
                           'Date',
                           style: TextStyle(color: Colors.black, fontSize: 14),
@@ -173,7 +176,59 @@ class _HelperPageState extends State<HelperPage> {
                   ],
                 ),
               ),
-              const Divider()
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                height: 200,
+                child: LineChart(
+                  LineChartData(
+                    minY: 1,
+                    maxY: 10,
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: const [
+                          FlSpot(0, 3),
+                          FlSpot(2.6, 2),
+                          FlSpot(4.9, 5),
+                          FlSpot(6.8, 3.1),
+                          FlSpot(8, 4),
+                          FlSpot(9.5, 3),
+                          FlSpot(11, 4),
+                        ],
+                        color: const Color(0xFF2367B1),
+                        barWidth: 5,
+                        isCurved: true,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(
+                          show: false,
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                        ),
+                      )
+                    ],
+                    titlesData: const FlTitlesData(
+                      show: false,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  children: [
+                    statsCard(),
+                    statsCard(),
+                    statsCard(),
+                  ],
+                ),
+              )
             ],
           ),
         ),

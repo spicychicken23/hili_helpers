@@ -61,6 +61,9 @@ class _ActPageState extends State<ActPage> {
                       children: <Widget>[
                         GestureDetector(
                           onTap: () {
+                            setState(() {
+                              _currentIndex = 0;
+                            });
                             Navigator.popUntil(
                                 context, ModalRoute.withName(HomePage.id));
                           },
@@ -85,7 +88,7 @@ class _ActPageState extends State<ActPage> {
                         stream: onGoingStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           }
