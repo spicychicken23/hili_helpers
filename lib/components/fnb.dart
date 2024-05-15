@@ -115,7 +115,7 @@ class menuListing extends StatelessWidget {
               title: Text(
                 menu.Name,
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),

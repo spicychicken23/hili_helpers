@@ -9,6 +9,7 @@ class users {
   String? gender;
   String? name;
   String? ph_no;
+  String? status;
   users({
     this.UID,
     this.address,
@@ -17,6 +18,7 @@ class users {
     this.gender,
     this.name,
     this.ph_no,
+    this.status,
   });
 
   users.fromJson(Map<String, Object?> json)
@@ -28,6 +30,7 @@ class users {
           gender: json['gender']! as String,
           name: json['name']! as String,
           ph_no: json['ph_no']! as String,
+          status: json['status']! as String,
         );
 
   users copyWith({
@@ -38,15 +41,18 @@ class users {
     String? gender,
     String? name,
     String? ph_no,
+    String? status,
   }) {
     return users(
-        UID: UID ?? this.UID,
-        address: address ?? this.address,
-        user_id: user_id ?? this.user_id,
-        birthdate: birthdate ?? this.birthdate,
-        gender: gender ?? this.gender,
-        name: name ?? this.name,
-        ph_no: ph_no ?? this.ph_no);
+      UID: UID ?? this.UID,
+      address: address ?? this.address,
+      user_id: user_id ?? this.user_id,
+      birthdate: birthdate ?? this.birthdate,
+      gender: gender ?? this.gender,
+      name: name ?? this.name,
+      ph_no: ph_no ?? this.ph_no,
+      status: status ?? this.status,
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -58,6 +64,7 @@ class users {
       'gender': gender,
       'name': name,
       'ph_no': ph_no,
+      'status': status,
     };
   }
 }

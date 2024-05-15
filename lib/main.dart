@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/widget_tree.dart';
 import 'package:hili_helpers/pages/FNB_page.dart';
 import 'package:hili_helpers/pages/ACT_page.dart';
+import 'package:hili_helpers/pages/Helper_page.dart';
 import 'package:hili_helpers/pages/home_page.dart';
 import 'pages/front_page.dart';
 import 'pages/login_page.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         FnbPage.id: (context) => FnbPage(),
         ActPage.id: (context) => ActPage(),
         HomePage.id: (context) => HomePage(),
+        HelperPage.id: (context) => HelperPage(),
       },
     ); // MaterialApp
   }

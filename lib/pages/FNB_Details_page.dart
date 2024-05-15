@@ -23,7 +23,7 @@ class _FnbDetailsPageState extends State<FnbDetailsPage> {
   void initState() {
     super.initState();
     _randomId = Random().nextInt(1000000000);
-    menuListsStream = DatabaseService().getMenuLists() as Stream<List<Menu>>;
+    menuListsStream = DatabaseService().getMenuLists();
   }
 
   void updateTotalQuantity(int newQuantity, bool status) {

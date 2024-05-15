@@ -41,6 +41,7 @@ dependencies:
   line_awesome_flutter: ^2.0.0
   firebase_database: ^10.5.0
   cloud_firestore: ^4.17.0
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:
