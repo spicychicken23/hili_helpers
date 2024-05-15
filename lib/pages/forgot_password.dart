@@ -25,6 +25,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       try {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
         print('Password reset email sent to $email');
+        // Navigate to a new route with the message
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PasswordResetSentPage(),
+          ),
+        );
       } catch (e) {
         print('Error sending password reset email: $e');
       }
@@ -64,8 +71,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 5), // Add sized box for spacing
-                    const SizedBox(height: 50), // Add sized box for spacing
+                    const SizedBox(height: 5),
+                    const SizedBox(height: 50),
                     MyTextField(
                       controller: _emailController,
                       hintText: 'Email',
@@ -102,6 +109,42 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class PasswordResetSentPage extends StatelessWidget {
+  const PasswordResetSentPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pushReplacementNamed(context, LoginPage.id);
+    });
+    return const Scaffold(
+      backgroundColor: Color(0xFFE4E6ED),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 100,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Password reset email has been sent',
+              style: TextStyle(
+                color: Color(0xFFD3A877),
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'DM Sans',
+              ),
+            ),
+          ],
         ),
       ),
     );

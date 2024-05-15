@@ -1,17 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Authentication
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:hili_helpers/components/textfield.dart';
 import 'package:hili_helpers/components/buttons.dart';
 import 'package:hili_helpers/pages/login_page.dart';
 
 class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+  RegisterPage({Key? key}); // Use Key? key instead of super.key
   static String id = 'register_page';
 
-  final usernameController = TextEditingController();
+  final nameController = TextEditingController();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
-  void signUserIn() {}
+  // Function to save user data to Firestore
+  void saveUserData(BuildContext context) async {
+    String name = nameController.text.trim();
+    String email = emailController.text.trim();
+    String password = passwordController.text;
+
+    // Check if all fields are filled
+    if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+      try {
+        // Create user account using Firebase Authentication
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({});
+
+        // Navigate to login page after successful registration
+        Navigator.pushNamed(context, LoginPage.id);
+      } catch (error) {
+        // Handle error if registration fails
+        print("Failed to register user: $error");
+        // Optionally, show an error message to the user
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to register user. Please try again."),
+        ));
+      }
+    } else {
+      // Show an error message if any field is empty
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Please fill in all fields."),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +92,8 @@ class RegisterPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 50),
                 MyTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
+                  controller: nameController,
+                  hintText: 'Name',
                   obscureText: false,
                   onChanged: (value) {},
                   validator: (value) {},
@@ -81,7 +120,8 @@ class RegisterPage extends StatelessWidget {
                   child: CustomButton(
                     buttonText: 'Create Account',
                     onPressed: () {
-                      Navigator.pushNamed(context, RegisterPage.id);
+                      // Call function to save user data
+                      saveUserData(context);
                     },
                   ),
                 ),
