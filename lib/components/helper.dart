@@ -171,7 +171,15 @@ class _SwitchExampleState extends State<SwitchExample> {
 }
 
 class statsCard extends StatelessWidget {
-  const statsCard({super.key});
+  final IconData icon;
+  final String title;
+  final String value;
+
+  const statsCard(
+      {super.key,
+      required this.icon,
+      required this.title,
+      required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -182,38 +190,81 @@ class statsCard extends StatelessWidget {
         ),
         color: Colors.white,
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(10),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: EdgeInsets.only(top: 1, bottom: 1),
-              child: Row(
-                children: [
-                  Icon(Icons.money_rounded),
-                  Text(
-                    "Total Sales",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                Icon(icon, size: 30),
+                const SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              "100",
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey,
-                fontWeight: FontWeight.normal,
-              ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    )
+                  ],
+                )
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class popularItems extends StatelessWidget {
+  const popularItems({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(
+                  'https://drive.usercontent.google.com/download?id=1pE1R5WqUnL5Cfn5cVBhK8ppQD20LUGht'),
+              radius: 20,
+            ),
+            title: Text(
+              'Cendoi ABC',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              "The best ABC cendoi in the universe! Beli ler babes.",
+              style: TextStyle(
+                fontSize: 8,
+              ),
+            ),
+          ),
+          Divider(),
+        ],
       ),
     );
   }

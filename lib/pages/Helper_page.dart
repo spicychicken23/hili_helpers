@@ -222,10 +222,46 @@ class _HelperPageState extends State<HelperPage> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    statsCard(),
-                    statsCard(),
-                    statsCard(),
+                    statsCard(
+                        icon: Icons.money_off_rounded,
+                        title: 'Sales',
+                        value: '200'),
+                    statsCard(
+                        icon: Icons.check_box_outlined,
+                        title: 'Items',
+                        value: '200'),
+                    statsCard(
+                        icon: Icons.history_toggle_off_rounded,
+                        title: 'Transactions',
+                        value: '200'),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  'Top Products',
+                  style: TextStyle(
+                    color: Color(0xFF000000),
+                    fontSize: 20,
+                    fontFamily: 'DM Sans',
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 100,
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: const [
+                    popularItems(),
+                    popularItems(),
+                    popularItems(),
                   ],
                 ),
               )
