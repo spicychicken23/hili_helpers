@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/models/promo.dart';
 import 'package:hili_helpers/pages/FNB_Details_page.dart';
 import '../models/fnbLists.dart';
-import 'package:hili_helpers/services/database_service.dart';
 
 Widget accBtn(String image, BuildContext context, String nextPageId) {
   return GestureDetector(
