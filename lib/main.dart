@@ -7,6 +7,7 @@ import 'package:hili_helpers/pages/ACT_page.dart';
 import 'package:hili_helpers/pages/Helper_page.dart';
 import 'package:hili_helpers/pages/VEH_page.dart';
 import 'package:hili_helpers/pages/home_page.dart';
+import 'package:hili_helpers/pages/userprofile_page.dart';
 import 'pages/front_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         EduPage.id: (context) => EduPage(),
         DomPage.id: (context) => DomPage(),
         VehPage.id: (context) => VehPage(),
+        AccountPage.id: (context) => AccountPage()
       },
     ); // MaterialApp
   }

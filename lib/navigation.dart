@@ -4,6 +4,7 @@ import 'package:hili_helpers/pages/ACT_page.dart';
 import 'package:hili_helpers/pages/Helper_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/pages/home_page.dart';
+import 'package:hili_helpers/pages/userprofile_page.dart';
 
 typedef OnPageChangedCallback = void Function(int);
 
@@ -40,7 +41,7 @@ class CustomNavigationBar extends StatelessWidget {
           case 2:
             break;
           case 3:
-            singOut(context);
+            Navigator.pushNamed(context, AccountPage.id);
             break;
           case 4:
             Navigator.pushNamed(context, HelperPage.id);
