@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/pages/Helper_stats_page.dart';
+import 'package:hili_helpers/pages/helper_stats_page.dart';
 
 class Selected extends StatefulWidget {
   final IconData icon;

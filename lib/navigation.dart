@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/auth.dart';
-import 'package:hili_helpers/pages/ACT_page.dart';
-import 'package:hili_helpers/pages/Helper_page.dart';
+import 'package:hili_helpers/pages/activity_page.dart';
+import 'package:hili_helpers/pages/helper_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/pages/userprofile_page.dart';

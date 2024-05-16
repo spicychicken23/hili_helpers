@@ -4,10 +4,7 @@ import 'package:hili_helpers/components/home.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/models/promo.dart';
-import 'package:hili_helpers/pages/DOM_page.dart';
-import 'package:hili_helpers/pages/EDU_page.dart';
-import 'package:hili_helpers/pages/FNB_page.dart';
-import 'package:hili_helpers/pages/VEH_page.dart';
+import 'package:hili_helpers/pages/services_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -222,19 +219,20 @@ class _HomePageState extends State<HomePage> {
                                           children: [
                                             allBtn(Icons.restaurant, 'FNB', () {
                                               Navigator.pushNamed(
-                                                  context, FnbPage.id);
+                                                  context, FnbPage.id,
+                                                  arguments: 'FNB');
                                             }),
                                             allBtn(Icons.school, 'EDU', () {
                                               Navigator.pushNamed(
-                                                  context, EduPage.id);
+                                                  context, FnbPage.id);
                                             }),
                                             allBtn(Icons.build, 'DOM', () {
                                               Navigator.pushNamed(
-                                                  context, DomPage.id);
+                                                  context, FnbPage.id);
                                             }),
                                             allBtn(Icons.drive_eta, 'VEH', () {
                                               Navigator.pushNamed(
-                                                  context, VehPage.id);
+                                                  context, FnbPage.id);
                                             }),
                                           ],
                                         ),
@@ -270,10 +268,14 @@ class _HomePageState extends State<HomePage> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: <Widget>[
-                          accBtn('lib/images/FNB.png', context, FnbPage.id),
-                          accBtn('lib/images/EDU.png', context, EduPage.id),
-                          accBtn('lib/images/DOM.png', context, DomPage.id),
-                          accBtn('lib/images/VEH.png', context, VehPage.id),
+                          accBtn(
+                              'lib/images/FNB.png', context, FnbPage.id, 'FNB'),
+                          accBtn(
+                              'lib/images/EDU.png', context, FnbPage.id, 'EDU'),
+                          accBtn(
+                              'lib/images/DOM.png', context, FnbPage.id, 'DOM'),
+                          accBtn(
+                              'lib/images/VEH.png', context, FnbPage.id, 'VEH'),
                         ],
                       ),
                     ),

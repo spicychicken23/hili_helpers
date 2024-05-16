@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
-import 'package:hili_helpers/models/fnbLists.dart';
+import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/models/cart_item.dart';
 
@@ -30,8 +30,10 @@ class DatabaseService {
             }).toList());
   }
 
-  Stream<List<fnb>> getFnbLists() {
+  Stream<List<fnb>> getFnbLists(String type) {
     return _fnbListsRef
+        .where('ID', isGreaterThanOrEqualTo: type)
+        .where('ID', isLessThan: type + '\uf8ff')
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map((doc) {
               return fnb.fromJson(doc.data() as Map<String, dynamic>);
@@ -231,7 +233,8 @@ class DatabaseService {
     }
   }
 
-  Future<int> totalTransactions(String shopId, {DateTime? startDate, DateTime? endDate}) async {
+  Future<int> totalTransactions(String shopId,
+      {DateTime? startDate, DateTime? endDate}) async {
     try {
       Query query = FirebaseFirestore.instance
           .collection('CartList')
@@ -252,7 +255,8 @@ class DatabaseService {
     }
   }
 
-  Future<int> totalSales(String shopId, {DateTime? startDate, DateTime? endDate}) async {
+  Future<int> totalSales(String shopId,
+      {DateTime? startDate, DateTime? endDate}) async {
     try {
       Query query = FirebaseFirestore.instance
           .collection('CartList')
@@ -280,7 +284,8 @@ class DatabaseService {
     }
   }
 
-  Future<int> totalQuantity(String shopId, {DateTime? startDate, DateTime? endDate}) async {
+  Future<int> totalQuantity(String shopId,
+      {DateTime? startDate, DateTime? endDate}) async {
     try {
       Query query = FirebaseFirestore.instance
           .collection('CartList')
@@ -308,4 +313,3 @@ class DatabaseService {
     }
   }
 }
-

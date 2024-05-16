@@ -1,6 +1,3 @@
-// ignore: unused_import
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Menu {
   String Description;
   String ID;
@@ -8,6 +5,8 @@ class Menu {
   String Name;
   double Price;
   String Shop_ID;
+  String? type;
+
   Menu({
     required this.Description,
     required this.ID,

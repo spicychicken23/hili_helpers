@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/edu.dart';
+import 'package:hili_helpers/components/services.dart';
+import 'package:hili_helpers/models/servicesLists.dart';
+import 'package:hili_helpers/services/database_service.dart';
 
-class EduPage extends StatefulWidget {
-  EduPage({super.key});
-  static String id = 'EDU_page';
+class FnbPage extends StatefulWidget {
+  FnbPage({Key? key}) : super(key: key);
+  static String id = 'FNB_page';
 
   @override
-  _EduPageState createState() => _EduPageState();
+  _FnbPageState createState() => _FnbPageState();
 }
 
-class _EduPageState extends State<EduPage> {
-  /*
+class _FnbPageState extends State<FnbPage> {
   late Stream<List<fnb>> fnbListsStream;
+  late String? pageType;
 
   @override
-  void initState() {
-    super.initState();
-    fnbListsStream = DatabaseService().getFnbLists();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args is String) {
+      pageType = args;
+      fnbListsStream = DatabaseService().getFnbLists(pageType!);
+    } else {
+      pageType = 'default';
+      fnbListsStream = DatabaseService().getFnbLists(pageType!);
+    }
   }
-  */
 
   @override
   Widget build(BuildContext context) {
+    final pageInfo = getPageInfo(pageType!);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFE4E6ED),
@@ -32,7 +42,7 @@ class _EduPageState extends State<EduPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                color: const Color(0xFF38b6ff),
+                color: pageInfo.color,
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,11 +60,20 @@ class _EduPageState extends State<EduPage> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Education',
-                      style: TextStyle(
+                    Text(
+                      pageInfo.title,
+                      style: const TextStyle(
                         color: Color(0xFF000000),
                         fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'DM Sans',
+                      ),
+                    ),
+                    Text(
+                      pageInfo.disclaimer,
+                      style: const TextStyle(
+                        color: Color.fromARGB(172, 255, 255, 255),
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'DM Sans',
                       ),
@@ -72,7 +91,6 @@ class _EduPageState extends State<EduPage> {
                         ),
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(20),
-                          //bottom: Radius.circular(20),
                         ),
                       ),
                       child: Container(
@@ -91,81 +109,83 @@ class _EduPageState extends State<EduPage> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF5983B1),
-                        Color(0xFF2367B1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(15),
-                      bottomRight: Radius.circular(15),
-                    ),
-                  ),
-                  child: Center(
-                    child: DecoratedBox(
-                      decoration: const BoxDecoration(
-                        color: Color.fromRGBO(244, 243, 243, 1),
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                          bottom: Radius.circular(20),
-                        ),
+              Container(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF5983B1),
+                          Color(0xFF2367B1),
+                        ],
                       ),
-                      child: Row(
-                        children: <Widget>[
-                          const Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 15),
-                                border: InputBorder.none,
-                                hintText: "What's on your mind?",
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 15,
-                                  fontFamily: 'Roboto',
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(15),
+                        bottomRight: Radius.circular(15),
+                      ),
+                    ),
+                    child: Center(
+                      child: DecoratedBox(
+                        decoration: const BoxDecoration(
+                          color: Color.fromRGBO(244, 243, 243, 1),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                            bottom: Radius.circular(20),
+                          ),
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            const Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 15),
+                                  border: InputBorder.none,
+                                  hintText: "What's on your mind?",
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15,
+                                    fontFamily: 'Roboto',
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF0C171D),
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(15),
-                                    bottomRight: Radius.circular(
-                                      15,
-                                    )),
-                              ),
-                              child: const Icon(
-                                Icons.search,
-                                color: Colors.white,
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF0C171D),
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(15),
+                                      bottomRight: Radius.circular(
+                                        15,
+                                      )),
+                                ),
+                                child: const Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
+              Container(
                 height: MediaQuery.of(context).size.height,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'Available Businesses',
@@ -176,12 +196,9 @@ class _EduPageState extends State<EduPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
-                    SizedBox(
+                    const SizedBox(height: 10),
+                    Container(
                       height: 350,
-                      child: eduListing(),
-                    )
-                    /*
                       child: StreamBuilder<List<fnb>>(
                         stream: fnbListsStream,
                         builder: (context, snapshot) {
@@ -194,13 +211,12 @@ class _EduPageState extends State<EduPage> {
                             return ListView.builder(
                               itemCount: fnbLists.length,
                               itemBuilder: (context, index) =>
-                                  fnbListing(fnbs: fnbLists[index]),
+                                  servicesListing(fnbs: fnbLists[index]),
                             );
                           }
                         },
                       ),
                     ),
-                    */
                   ],
                 ),
               ),

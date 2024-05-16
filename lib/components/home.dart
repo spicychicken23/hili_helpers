@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/models/promo.dart';
-import 'package:hili_helpers/pages/FNB_Details_page.dart';
-import '../models/fnbLists.dart';
+import 'package:hili_helpers/pages/services_details_page.dart';
+import '../models/servicesLists.dart';
 
-Widget accBtn(String image, BuildContext context, String nextPageId) {
+Widget accBtn(
+    String image, BuildContext context, String nextPageId, String pageType) {
   return GestureDetector(
     onTap: () {
-      Navigator.pushNamed(context, nextPageId);
+      Navigator.pushNamed(context, nextPageId, arguments: pageType);
     },
     child: AspectRatio(
       aspectRatio: 2.62 / 3,
@@ -90,10 +91,14 @@ class NewsPromo extends StatelessWidget {
       onTap: () async {
         fnb? fetchedFnb = await fetchFnbByShopId(promo.Shop_ID);
         if (fetchedFnb != null) {
+          String pageType = promo.Shop_ID.substring(0, 3);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FnbDetailsPage(Fnb: fetchedFnb),
+              builder: (context) => FnbDetailsPage(
+                Fnb: fetchedFnb,
+                pageType: pageType,
+              ),
             ),
           );
         }

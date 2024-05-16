@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/widget_tree.dart';
-import 'package:hili_helpers/pages/DOM_page.dart';
-import 'package:hili_helpers/pages/EDU_page.dart';
-import 'package:hili_helpers/pages/FNB_page.dart';
-import 'package:hili_helpers/pages/ACT_page.dart';
-import 'package:hili_helpers/pages/Helper_page.dart';
-import 'package:hili_helpers/pages/VEH_page.dart';
+import 'package:hili_helpers/pages/services_page.dart';
+import 'package:hili_helpers/pages/activity_page.dart';
+import 'package:hili_helpers/pages/helper_page.dart';
 import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/pages/userprofile_page.dart';
 import 'pages/front_page.dart';
@@ -38,9 +35,6 @@ class MyApp extends StatelessWidget {
         ActPage.id: (context) => ActPage(),
         HomePage.id: (context) => HomePage(),
         HelperPage.id: (context) => HelperPage(),
-        EduPage.id: (context) => EduPage(),
-        DomPage.id: (context) => DomPage(),
-        VehPage.id: (context) => VehPage(),
         AccountPage.id: (context) => AccountPage()
       },
     ); // MaterialApp

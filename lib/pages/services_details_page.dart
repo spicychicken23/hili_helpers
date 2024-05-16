@@ -1,22 +1,26 @@
-import 'package:flutter/material.dart';
-import 'package:hili_helpers/components/fnb.dart';
+import 'dart:math';
 
-class VehDetailsPage extends StatefulWidget {
-  /*
+import 'package:flutter/material.dart';
+import 'package:hili_helpers/components/services.dart';
+import 'package:hili_helpers/models/servicesLists.dart';
+import 'package:hili_helpers/services/database_service.dart';
+import '../models/menu.dart';
+
+class FnbDetailsPage extends StatefulWidget {
   final fnb Fnb;
-  EduDetailsPage({Key? key, required this.Fnb}) : super(key: key);
-  */
+  final String pageType;
+  FnbDetailsPage({Key? key, required this.Fnb, required this.pageType})
+      : super(key: key);
 
   @override
-  _VehDetailsPageState createState() => _VehDetailsPageState();
+  _FnbDetailsPageState createState() => _FnbDetailsPageState();
 }
 
-class _VehDetailsPageState extends State<VehDetailsPage> {
-  /*
+class _FnbDetailsPageState extends State<FnbDetailsPage> {
   late Stream<List<Menu>> menuListsStream;
   late int _randomId;
   int _totalQuantity = 0;
-  
+  late final PageInfo pageInfo = getPageInfo(widget.pageType);
 
   @override
   void initState() {
@@ -30,7 +34,6 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
       status ? _totalQuantity += newQuantity : _totalQuantity -= newQuantity;
     });
   }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +48,7 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    color: const Color(0xFFff914d),
+                    color: pageInfo.color,
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     height: 250,
                     child: Column(
@@ -65,7 +68,7 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Ali Tayar',
+                          widget.Fnb.Name,
                           style: const TextStyle(
                             color: Color(0xFF000000),
                             fontSize: 25,
@@ -85,23 +88,22 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
               left: 0,
               right: 0,
               child: Container(
-                height: MediaQuery.of(context).size.height,
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        'Tire Types',
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontFamily: 'DM Sans',
-                          fontWeight: FontWeight.bold,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          pageInfo.heading,
+                          style: const TextStyle(
+                            fontSize: 25,
+                            fontFamily: 'DM Sans',
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    /*
+                      const SizedBox(height: 10),
                       Container(
                         height: 300,
                         child: StreamBuilder<List<Menu>>(
@@ -126,10 +128,8 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                           },
                         ),
                       ),
-                      */
-                  ],
-                ),
-              ),
+                    ],
+                  )),
             ),
             Positioned(
               top: 180,
@@ -155,7 +155,7 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                       Column(
                         children: [
                           Text(
-                            '3.8',
+                            widget.Fnb.Rating.toString(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 50,
@@ -164,7 +164,7 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                             ),
                           ),
                           Text(
-                            '1 Raters',
+                            '${widget.Fnb.Raters} Raters',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -182,11 +182,11 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                       ),
                       Column(
                         children: [
-                          ratingBar('5', 0),
-                          ratingBar('4', 0),
-                          ratingBar('3', 1),
-                          ratingBar('2', 0),
-                          ratingBar('1', 0),
+                          ratingBar('5', widget.Fnb.Rate_5 / widget.Fnb.Raters),
+                          ratingBar('4', widget.Fnb.Rate_4 / widget.Fnb.Raters),
+                          ratingBar('3', widget.Fnb.Rate_3 / widget.Fnb.Raters),
+                          ratingBar('2', widget.Fnb.Rate_2 / widget.Fnb.Raters),
+                          ratingBar('1', widget.Fnb.Rate_1 / widget.Fnb.Raters),
                         ],
                       ),
                       const SizedBox(
@@ -196,7 +196,7 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                         children: [
                           ClipOval(
                             child: Image.network(
-                              'https://drive.usercontent.google.com/download?id=1pE1R5WqUnL5Cfn5cVBhK8ppQD20LUGht',
+                              widget.Fnb.Icon,
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
@@ -208,7 +208,6 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
                           const Icon(
                             Icons.chevron_right,
                             color: Color(0xFFD3A877),
-                            //size: 25,
                           ),
                         ],
                       ),
@@ -220,7 +219,6 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
           ],
         ),
       ),
-      /*
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _totalQuantity > 0
           ? FloatingActionButton.extended(
@@ -241,7 +239,6 @@ class _VehDetailsPageState extends State<VehDetailsPage> {
               label: const Text("Proceed"),
             )
           : null,
-          */
     );
   }
 }

@@ -14,7 +14,6 @@ class fnb {
   int Rate_4;
   int Rate_5;
   String Icon;
-
   fnb({
     required this.ID,
     required this.Name,

@@ -3,15 +3,70 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hili_helpers/models/cart.dart';
-import 'package:hili_helpers/models/fnbLists.dart';
+import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/models/menu.dart';
-import 'package:hili_helpers/pages/FNB_Details_page.dart';
+import 'package:hili_helpers/pages/services_details_page.dart';
 import 'package:hili_helpers/models/cart_item.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 // ignore: camel_case_types
-class fnbListing extends StatelessWidget {
-  const fnbListing({Key? key, required this.fnbs}) : super(key: key);
+class PageInfo {
+  final Color color;
+  final String title;
+  final String disclaimer;
+  final String heading;
+  final String type;
+  PageInfo(
+      {required this.color,
+      required this.title,
+      required this.disclaimer,
+      required this.heading,
+      required this.type});
+}
+
+PageInfo getPageInfo(String pageType) {
+  switch (pageType) {
+    case 'FNB':
+      return PageInfo(
+          type: 'FNB',
+          color: const Color(0xFFDB9439),
+          title: 'Food and Beverages',
+          disclaimer: '',
+          heading: 'Menu');
+    case 'EDU':
+      return PageInfo(
+          type: 'EDU',
+          color: const Color(0xFF38b6ff),
+          title: 'Educational classes',
+          disclaimer: '*All orders should be make 1 week prior to class',
+          heading: 'Offered classes');
+    case 'DOM':
+      return PageInfo(
+          type: 'DOM',
+          color: const Color(0xFFff5757),
+          title: 'Domestic services',
+          disclaimer: '*All prices are only consultation fees',
+          heading: 'Offered services');
+    case 'VEH':
+      return PageInfo(
+          type: 'VEH',
+          color: const Color(0xFFff914d),
+          title: 'Vehicles Care',
+          disclaimer: '*All prices are only consultation fees',
+          heading: 'Offered services');
+    default:
+      return PageInfo(
+        type: '',
+        color: const Color(0xFF38b6ff),
+        title: 'Unknown',
+        disclaimer: '',
+        heading: '',
+      );
+  }
+}
+
+class servicesListing extends StatelessWidget {
+  const servicesListing({Key? key, required this.fnbs}) : super(key: key);
 
   final fnb fnbs;
 
@@ -19,10 +74,11 @@ class fnbListing extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        String pageType = fnbs.ID.substring(0, 3);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FnbDetailsPage(Fnb: fnbs),
+            builder: (context) => FnbDetailsPage(Fnb: fnbs, pageType: pageType),
           ),
         );
       },
@@ -425,38 +481,38 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Order Details',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Total Items: $quantity',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Total Price: RM$subtotal',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     'Items Ordered:',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
                     itemCount: items.length,
