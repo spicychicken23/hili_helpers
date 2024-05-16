@@ -64,6 +64,7 @@ class _ActPageState extends State<ActPage> {
                             setState(() {
                               _currentIndex = 0;
                             });
+                            //change
                             Navigator.popUntil(
                                 context, ModalRoute.withName(HomePage.id));
                           },

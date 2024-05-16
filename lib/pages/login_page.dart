@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hili_helpers/components/front.dart';
+import 'package:hili_helpers/pages/forgot_password.dart';
 import 'package:hili_helpers/pages/register_page.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/components/auth.dart';
@@ -72,6 +73,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void _goToForgotPasswordPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+    );
+  }
+
   bool _isValidEmail(String email) {
     final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
@@ -135,16 +143,22 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Color(0xFF828282)),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: _goToForgotPasswordPage,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 25),

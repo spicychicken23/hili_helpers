@@ -1,34 +1,32 @@
-//done
-//latest
-
-// ignore: file_names
 import 'package:flutter/material.dart';
+import 'package:hili_helpers/components/auth.dart';
+import 'package:hili_helpers/navigation.dart';
+import 'package:hili_helpers/pages/front_page.dart';
 // ignore: unused_import
 import 'account_info_page.dart'; // Import the renamed account file
 
-// void main() {
-//   runApp(const MyApp());
-// }
+Future<void> signOut(BuildContext context) async {
+  await Auth().signOut();
+  Navigator.pushReplacementNamed(context, FrontPage.id);
+}
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'User Profile',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: const AccountPage(),
-//     );
-//   }
-// }
-
-class AccountPage extends StatelessWidget {
-  const AccountPage({Key? key});
+class AccountPage extends StatefulWidget {
+  AccountPage({super.key});
   static String id = 'userprofile_page';
+
+  @override
+  _AccountPageState createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  int _currentIndex = 3;
+  late String? userStatus = 'User';
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +35,7 @@ class AccountPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () {
-            // Add your action here
+            Navigator.pop(context);
           },
         ),
         title: const Text('Account'),
@@ -48,7 +46,8 @@ class AccountPage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ContactInfoPage()),
+                MaterialPageRoute(
+                    builder: (context) => const ContactInfoPage()),
               );
             },
             child: Center(
@@ -82,7 +81,8 @@ class AccountPage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ContactInfoPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const ContactInfoPage()),
                   );
                 },
               ),
@@ -117,26 +117,15 @@ class AccountPage extends StatelessWidget {
             title: const Text('Logout'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // Add your action here
+              signOut(context);
             },
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Account',
-          ),
-        ],
+      bottomNavigationBar: CustomNavigationBar(
+        userStatus: userStatus,
+        currentIndex: _currentIndex,
+        onPageChanged: _onPageChanged,
       ),
     );
   }

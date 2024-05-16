@@ -43,7 +43,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   File? _pickedImage;
 
   Future<void> _getImage() async {
-    final pickedImage = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final pickedImage =
+        await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       setState(() {
@@ -123,10 +124,14 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
                   onTap: _getImage,
                   child: CircleAvatar(
                     radius: 60,
-                    backgroundColor: const Color.fromARGB(255, 20, 64, 100).withOpacity(0.9),
+                    backgroundColor:
+                        const Color.fromARGB(255, 20, 64, 100).withOpacity(0.9),
                     child: _pickedImage == null
-                        ? const Icon(Icons.person, size: 60, color: Colors.white)
-                        : ClipOval(child: Image.file(_pickedImage!, fit: BoxFit.cover)),
+                        ? const Icon(Icons.person,
+                            size: 60, color: Colors.white)
+                        : ClipOval(
+                            child:
+                                Image.file(_pickedImage!, fit: BoxFit.cover)),
                   ),
                 ),
                 Positioned(
@@ -151,7 +156,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.person),
             title: const Text('Name'),
             subtitle: Text(name ?? 'Enter your name'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -183,7 +189,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.cake),
             title: const Text('Birthdate'),
             subtitle: Text(birthdate ?? 'Select your birthdate'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -215,7 +222,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.person_outline),
             title: const Text('Gender'),
             subtitle: Text(gender ?? 'Select your gender'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -247,7 +255,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.email),
             title: const Text('Email'),
             subtitle: Text(email ?? 'Enter your email'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -279,7 +288,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.phone),
             title: const Text('Phone Number'),
             subtitle: Text(phoneNumber ?? 'Enter your phone number'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -312,7 +322,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.home),
             title: const Text('Address'),
             subtitle: Text(address ?? 'Enter your address'),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing: const Text('Change',
+                style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
               showDialog(
                 context: context,
@@ -338,15 +349,6 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
                   );
                 },
               );
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.logout_sharp),
-            title: const Text('L O G O U T'),
-            //trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              // Implement logout logic here
             },
           ),
         ],
