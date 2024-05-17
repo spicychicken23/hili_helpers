@@ -75,6 +75,7 @@ class servicesListing extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String pageType = fnbs.ID.substring(0, 3);
+
         Navigator.push(
           context,
           MaterialPageRoute(

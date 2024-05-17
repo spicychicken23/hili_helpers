@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hili_helpers/components/services.dart';
+import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/pages/helper_stats_page.dart';
+import 'package:hili_helpers/services/database_service.dart';
 
 class Selected extends StatefulWidget {
   final IconData icon;
@@ -191,7 +194,7 @@ class statsCard extends StatelessWidget {
         color: Colors.white,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -200,9 +203,10 @@ class statsCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 30),
                 const SizedBox(
-                  width: 10,
+                  width: 8,
                 ),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
@@ -234,38 +238,124 @@ class statsCard extends StatelessWidget {
   }
 }
 
-class popularItems extends StatelessWidget {
-  const popularItems({super.key});
+class PopularItems extends StatelessWidget {
+  const PopularItems({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://drive.usercontent.google.com/download?id=1pE1R5WqUnL5Cfn5cVBhK8ppQD20LUGht'),
-              radius: 20,
-            ),
-            title: Text(
-              'Cendoi ABC',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseService().getTopProducts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Map<String, dynamic>>? topItems = snapshot.data;
+          if (topItems == null || topItems.isEmpty) {
+            return const Text('No top products available.');
+          } else {
+            return Column(
+              children: topItems.asMap().entries.map((entry) {
+                int index = entry.key;
+                Map<String, dynamic> item = entry.value;
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Text(
+                        (index + 1).toString(),
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      title: Text(
+                        item['itemName'],
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        "Quantity: ${item['quantity']}",
+                        style: const TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
+                    const Divider(),
+                  ],
+                );
+              }).toList(),
+            );
+          }
+        }
+      },
+    );
+  }
+}
+
+class ShopRatings extends StatelessWidget {
+  const ShopRatings({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: DatabaseService().fetchFnbRatingsByOwner(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<String>? ratings = snapshot.data;
+          if (ratings != null && ratings.isNotEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        ratings[0],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontFamily: 'DM Sans',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${ratings[1]} Raters',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'DM Sans',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ratingBar(
+                          '5', int.parse(ratings[2]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '4', int.parse(ratings[3]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '3', int.parse(ratings[4]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '2', int.parse(ratings[5]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '1', int.parse(ratings[6]) / int.parse(ratings[1])),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            subtitle: Text(
-              "The best ABC cendoi in the universe! Beli ler babes.",
-              style: TextStyle(
-                fontSize: 8,
-              ),
-            ),
-          ),
-          Divider(),
-        ],
-      ),
+            );
+          } else {
+            return const Text('No ratings data available.');
+          }
+        }
+      },
     );
   }
 }

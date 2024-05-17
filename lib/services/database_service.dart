@@ -166,6 +166,8 @@ class DatabaseService {
           .collection('CartList')
           .doc('${cartId}_$userId')
           .set(data);
+
+      await newCart.saveItems(userId);
     } else {
       print('Mu hacker ke? Tlg la jangan.');
     }
@@ -213,11 +215,42 @@ class DatabaseService {
     }
   }
 
-  Future<fnb?> fetchFnbByShopId(String shopId) async {
+  Future<List<String>> fetchFnbRatingsByOwner() async {
+    String? userId = _auth.currentUser?.uid;
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('fnbLists')
+          .where('Owner', isEqualTo: userId)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        List<String> ratings = [
+          '${doc['Rating']}',
+          '${doc['Raters']}',
+          '${doc['Rate_1']}',
+          '${doc['Rate_2']}',
+          '${doc['Rate_2']}',
+          '${doc['Rate_2']}',
+          '${doc['Rate_2']}',
+        ];
+        return ratings;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching fnb: $e');
+      return [];
+    }
+  }
+
+  Future<fnb?> fetchFnbByOwner() async {
+    String? userId = _auth.currentUser?.uid;
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('fnb')
-          .where('ID', isEqualTo: shopId)
+          .where('Owner', isEqualTo: userId)
           .limit(1)
           .get();
 
@@ -233,30 +266,10 @@ class DatabaseService {
     }
   }
 
-  Future<int> totalTransactions(String shopId,
-      {DateTime? startDate, DateTime? endDate}) async {
-    try {
-      Query query = FirebaseFirestore.instance
-          .collection('CartList')
-          .where('shop_Id', isEqualTo: shopId);
+  Future<double> totalSales({DateTime? startDate, DateTime? endDate}) async {
+    String? userId = _auth.currentUser?.uid;
+    String? shopId = await getShopId(userId!);
 
-      if (startDate != null && endDate != null) {
-        query = query
-            .where('timestamp', isGreaterThanOrEqualTo: startDate)
-            .where('timestamp', isLessThanOrEqualTo: endDate);
-      }
-
-      AggregateQuerySnapshot querySnapshot = await query.count().get();
-
-      return querySnapshot.count ?? 0;
-    } catch (e) {
-      print('Error counting transactions: $e');
-      return 0;
-    }
-  }
-
-  Future<int> totalSales(String shopId,
-      {DateTime? startDate, DateTime? endDate}) async {
     try {
       Query query = FirebaseFirestore.instance
           .collection('CartList')
@@ -270,13 +283,12 @@ class DatabaseService {
 
       QuerySnapshot querySnapshot = await query.get();
 
-      int totalSales = 0;
+      double totalSales = 0;
 
       for (var doc in querySnapshot.docs) {
         var data = doc.data() as Map<String, dynamic>;
-        totalSales += data['total'] as int? ?? 0;
+        totalSales += data['total'] as double? ?? 0;
       }
-
       return totalSales;
     } catch (e) {
       print('Error calculating total sales: $e');
@@ -284,8 +296,10 @@ class DatabaseService {
     }
   }
 
-  Future<int> totalQuantity(String shopId,
-      {DateTime? startDate, DateTime? endDate}) async {
+  Future<int> totalQuantity({DateTime? startDate, DateTime? endDate}) async {
+    String? userId = _auth.currentUser?.uid;
+    String? shopId = await getShopId(userId!);
+
     try {
       Query query = FirebaseFirestore.instance
           .collection('CartList')
@@ -310,6 +324,88 @@ class DatabaseService {
     } catch (e) {
       print('Error calculating total quantity: $e');
       return 0;
+    }
+  }
+
+  Future<int> totalTransaction() async {
+    String? userId = _auth.currentUser?.uid;
+    String? shopId = await getShopId(userId!);
+    try {
+      Query query = FirebaseFirestore.instance
+          .collection('CartList')
+          .where('shop_Id', isEqualTo: shopId);
+
+      QuerySnapshot querySnapshot = await query.get();
+
+      return querySnapshot.size;
+    } catch (e) {
+      print('Error calculating total transactions: $e');
+      return 0;
+    }
+  }
+
+  Future<String?> getShopId(String ownerId) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('fnbLists')
+          .where('Owner', isEqualTo: ownerId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        Map<String, dynamic>? userData =
+            docSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          String? shopId = userData['ID'] as String?;
+          if (shopId != null) {
+            return shopId;
+          } else {
+            print('Shop ID is null.');
+          }
+        } else {
+          print('User data is null.');
+        }
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getTopProducts() async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    try {
+      List<Map<String, dynamic>> topItems = [];
+
+      for (int i = 0;; i++) {
+        String documentId = '${userId}_$i';
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('Items')
+            .doc(documentId)
+            .get();
+
+        if (!documentSnapshot.exists) {
+          break;
+        }
+
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+
+        topItems.add({
+          'itemName': data['itemName'],
+          'quantity': data['quantity'],
+        });
+      }
+
+      topItems.sort((a, b) => b['quantity'].compareTo(a['quantity']));
+      print(topItems);
+      return topItems.take(3).toList();
+    } catch (e) {
+      return [];
     }
   }
 }

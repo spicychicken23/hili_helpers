@@ -95,7 +95,9 @@ class RegisterPage extends StatelessWidget {
                   hintText: 'Name',
                   obscureText: false,
                   onChanged: (value) {},
-                  validator: (value) {},
+                  validator: (value) {
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 10),
                 MyTextField(
@@ -103,7 +105,9 @@ class RegisterPage extends StatelessWidget {
                   hintText: 'Email Address',
                   obscureText: false,
                   onChanged: (value) {},
-                  validator: (value) {},
+                  validator: (value) {
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 10),
                 MyTextField(
@@ -111,7 +115,9 @@ class RegisterPage extends StatelessWidget {
                   hintText: 'Password',
                   obscureText: true,
                   onChanged: (value) {},
-                  validator: (value) {},
+                  validator: (value) {
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 35),
                 Hero(
