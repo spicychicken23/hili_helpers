@@ -224,15 +224,18 @@ class _HomePageState extends State<HomePage> {
                                             }),
                                             allBtn(Icons.school, 'EDU', () {
                                               Navigator.pushNamed(
-                                                  context, FnbPage.id);
+                                                  context, FnbPage.id,
+                                                  arguments: 'EDU');
                                             }),
                                             allBtn(Icons.build, 'DOM', () {
                                               Navigator.pushNamed(
-                                                  context, FnbPage.id);
+                                                  context, FnbPage.id,
+                                                  arguments: 'DOM');
                                             }),
                                             allBtn(Icons.drive_eta, 'VEH', () {
                                               Navigator.pushNamed(
-                                                  context, FnbPage.id);
+                                                  context, FnbPage.id,
+                                                  arguments: 'VEH');
                                             }),
                                           ],
                                         ),

@@ -14,6 +14,7 @@ class fnb {
   int Rate_4;
   int Rate_5;
   String Icon;
+  bool open;
   fnb({
     required this.ID,
     required this.Name,
@@ -27,6 +28,7 @@ class fnb {
     required this.Rate_4,
     required this.Rate_5,
     required this.Icon,
+    required this.open,
   });
 
   fnb.fromJson(Map<String, Object?> json)
@@ -43,6 +45,7 @@ class fnb {
           Rate_4: json['Rate_4'] as int,
           Rate_5: json['Rate_5'] as int,
           Icon: json['Icon'] as String,
+          open: json['open'] as bool,
         );
 
   fnb copyWith({
@@ -58,6 +61,7 @@ class fnb {
     int? Rate_4,
     int? Rate_5,
     String? Icon,
+    bool? open,
   }) {
     return fnb(
       ID: ID ?? this.ID,
@@ -72,6 +76,7 @@ class fnb {
       Rate_4: Rate_4 ?? this.Rate_4,
       Rate_5: Rate_5 ?? this.Rate_5,
       Icon: Icon ?? this.Icon,
+      open: open ?? this.open,
     );
   }
 
@@ -89,6 +94,7 @@ class fnb {
       'Rate_4': Rate_4,
       'Rate_5': Rate_5,
       'Icon': Icon,
+      'open': open
     };
   }
 }

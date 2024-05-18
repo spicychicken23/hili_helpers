@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hili_helpers/pages/helper_stats_page.dart';
+import 'package:hili_helpers/components/services.dart';
+import 'package:hili_helpers/models/menu.dart';
+import 'package:hili_helpers/pages/helper_stocks_page.dart';
+import 'package:hili_helpers/services/database_service.dart';
 
 class Selected extends StatefulWidget {
   final IconData icon;
   final String label;
-  final bool isSelected;
   final String isEnd;
   final VoidCallback onTap;
 
@@ -12,7 +14,6 @@ class Selected extends StatefulWidget {
     Key? key,
     required this.icon,
     required this.label,
-    required this.isSelected,
     required this.onTap,
     required this.isEnd,
   }) : super(key: key);
@@ -46,9 +47,7 @@ class _SelectedState extends State<Selected> {
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: widget.isSelected
-                ? const Color(0xff38220f)
-                : const Color(0xFFdbc1ac),
+            color: const Color(0xFFdbc1ac),
             borderRadius: borderRadius,
           ),
           child: Row(
@@ -57,17 +56,14 @@ class _SelectedState extends State<Selected> {
             children: <Widget>[
               Icon(
                 widget.icon,
-                color:
-                    widget.isSelected ? Colors.white : const Color(0xff38220f),
+                color: const Color(0xff38220f),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 widget.label,
-                style: TextStyle(
-                  color: widget.isSelected
-                      ? Colors.white
-                      : const Color(0xff38220f),
+                style: const TextStyle(
+                  color: Color(0xff38220f),
                   fontSize: 16,
                 ),
               ),
@@ -87,8 +83,6 @@ class HelperNaviBar extends StatefulWidget {
 }
 
 class _HelperNaviBarState extends State<HelperNaviBar> {
-  int _selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -97,18 +91,9 @@ class _HelperNaviBarState extends State<HelperNaviBar> {
         children: <Widget>[
           Selected(
             icon: Icons.bar_chart_rounded,
-            label: "Stats",
-            isSelected: _selectedIndex == 0,
+            label: "Orders",
             isEnd: 'Left',
-            onTap: () {
-              setState(() {
-                _selectedIndex = 0;
-              });
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HelperStatsPage()),
-              );
-            },
+            onTap: () {},
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
@@ -116,28 +101,13 @@ class _HelperNaviBarState extends State<HelperNaviBar> {
           ),
           Selected(
             icon: Icons.money_rounded,
-            label: "Orders",
-            isSelected: _selectedIndex == 1,
-            isEnd: 'Mid',
-            onTap: () {
-              setState(() {
-                _selectedIndex = 1;
-              });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Container(color: Colors.black, width: 2),
-          ),
-          Selected(
-            icon: Icons.warehouse_rounded,
             label: "Stocks",
-            isSelected: _selectedIndex == 2,
             isEnd: 'Right',
             onTap: () {
-              setState(() {
-                _selectedIndex = 2;
-              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelperStocksPage()),
+              );
             },
           ),
         ],
@@ -146,25 +116,50 @@ class _HelperNaviBarState extends State<HelperNaviBar> {
   }
 }
 
-class SwitchExample extends StatefulWidget {
-  const SwitchExample({super.key});
+class shopStatus extends StatefulWidget {
+  const shopStatus({super.key});
 
   @override
-  State<SwitchExample> createState() => _SwitchExampleState();
+  State<shopStatus> createState() => _shopStatusState();
 }
 
-class _SwitchExampleState extends State<SwitchExample> {
-  bool light = true;
+class _shopStatusState extends State<shopStatus> {
+  late bool light;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchShopStatus();
+  }
+
+  Future<void> _fetchShopStatus() async {
+    bool? shopStatus = await DatabaseService().getShopStatus();
+    setState(() {
+      light = shopStatus ?? false;
+    });
+  }
+
   Widget build(BuildContext context) {
-    return Switch(
-      value: light,
-      activeColor: Colors.green,
-      onChanged: (bool value) {
-        setState(() {
-          light = value;
-        });
+    return FutureBuilder<bool?>(
+      future: DatabaseService().getShopStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return Switch(
+            value: snapshot.data ?? false,
+            activeColor: Colors.green,
+            onChanged: (bool value) {
+              setState(() {
+                light = value;
+                DatabaseService().toggleShopStatus(value);
+                _fetchShopStatus();
+              });
+            },
+          );
+        }
       },
     );
   }
@@ -191,7 +186,7 @@ class statsCard extends StatelessWidget {
         color: Colors.white,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -200,9 +195,10 @@ class statsCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 30),
                 const SizedBox(
-                  width: 10,
+                  width: 8,
                 ),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
@@ -234,37 +230,342 @@ class statsCard extends StatelessWidget {
   }
 }
 
-class popularItems extends StatelessWidget {
-  const popularItems({super.key});
+class PopularItems extends StatelessWidget {
+  const PopularItems({Key? key, this.sales, this.quantities}) : super(key: key);
+  final double? sales;
+  final int? quantities;
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://drive.usercontent.google.com/download?id=1pE1R5WqUnL5Cfn5cVBhK8ppQD20LUGht'),
-              radius: 20,
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseService().getTopProducts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Map<String, dynamic>>? topItems = snapshot.data;
+          if (topItems == null || topItems.isEmpty) {
+            return const Text('No top products available.');
+          } else {
+            return Column(
+              children: topItems.asMap().entries.map((entry) {
+                int index = entry.key;
+                Map<String, dynamic> item = entry.value;
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Text(
+                        (index + 1).toString(),
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      title: Text(
+                        item['itemName'],
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Quantity sold: ${item['quantity']}",
+                            style: const TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                          Text(
+                            "[${((item['quantity'] / quantities) * 100).toStringAsFixed(0)} %]",
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Total sales: ${item['total']}",
+                            style: const TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                          Text(
+                            "[${((item['total'] / sales) * 100).toStringAsFixed(0)} %]",
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            );
+          }
+        }
+      },
+    );
+  }
+}
+
+class ShopRatings extends StatelessWidget {
+  const ShopRatings({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: DatabaseService().fetchFnbRatingsByOwner(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<String>? ratings = snapshot.data;
+          if (ratings != null && ratings.isNotEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        ratings[0],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontFamily: 'DM Sans',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${ratings[1]} Raters',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'DM Sans',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ratingBar(
+                          '5', int.parse(ratings[2]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '4', int.parse(ratings[3]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '3', int.parse(ratings[4]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '2', int.parse(ratings[5]) / int.parse(ratings[1])),
+                      ratingBar(
+                          '1', int.parse(ratings[6]) / int.parse(ratings[1])),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return const Text('No ratings data available.');
+          }
+        }
+      },
+    );
+  }
+}
+
+class StocksListing extends StatelessWidget {
+  const StocksListing({
+    Key? key,
+    required this.menu,
+    required this.shopId,
+  }) : super(key: key);
+
+  final Menu menu;
+  final String shopId;
+
+  void _deleteStock(BuildContext context) {
+    DatabaseService().deleteStock(menu.ID);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Stock deleted'),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this stock?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
             ),
-            title: Text(
-              'Cendoi ABC',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteStock(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (menu.Shop_ID != shopId) {
+      return Container();
+    }
+
+    return GestureDetector(
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          children: [
+            Row(children: [
+              GestureDetector(
+                onTap: () {},
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFdbc1ac),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(Icons.edit,
+                        color: Color.fromARGB(255, 83, 59, 38)),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              GestureDetector(
+                onTap: () => _confirmDelete(context),
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFdbc1ac),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(Icons.delete_rounded,
+                        color: Color.fromARGB(255, 83, 59, 38)),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              ItemStatus(itemId: menu.ID),
+            ]),
+            ListTile(
+              leading: ClipOval(
+                child: Image.network(
+                  menu.Icon,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              title: Text(
+                menu.Name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Row(
+                children: [
+                  Text(
+                    menu.Description,
+                    style: const TextStyle(
+                      fontSize: 8,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ],
+              ),
+              trailing: Column(
+                children: [
+                  Text(
+                    'RM${menu.Price}',
+                    style: const TextStyle(
+                      color: Color(0xFFB3B3B3),
+                      fontSize: 10,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ],
               ),
             ),
-            subtitle: Text(
-              "The best ABC cendoi in the universe! Beli ler babes.",
-              style: TextStyle(
-                fontSize: 8,
-              ),
-            ),
-          ),
-          Divider(),
-        ],
+            const Divider(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ItemStatus extends StatefulWidget {
+  const ItemStatus({super.key, required this.itemId});
+  final String itemId;
+
+  @override
+  State<ItemStatus> createState() => _ItemStatusState();
+}
+
+class _ItemStatusState extends State<ItemStatus> {
+  late bool light;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchItemStatus();
+  }
+
+  Future<void> _fetchItemStatus() async {
+    bool? itemStatus = await DatabaseService().getStockStatus(widget.itemId);
+    setState(() {
+      light = itemStatus ?? false;
+      isLoading = false;
+    });
+  }
+
+  void _toggleItemStatus(bool value) async {
+    setState(() {
+      light = value;
+    });
+    await DatabaseService().toggleStockStatus(value, widget.itemId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const CircularProgressIndicator();
+    }
+    return Transform.scale(
+      scale: 0.7,
+      child: Switch(
+        value: light,
+        activeColor: Colors.green,
+        onChanged: (bool value) {
+          _toggleItemStatus(value);
+        },
       ),
     );
   }

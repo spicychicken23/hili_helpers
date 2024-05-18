@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/pages/front_page.dart';
+import 'package:hili_helpers/services/database_service.dart';
 // ignore: unused_import
 import 'account_info_page.dart'; // Import the renamed account file
 
@@ -20,12 +21,24 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   int _currentIndex = 3;
-  late String? userStatus = 'User';
 
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  late String? userStatus = 'User';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    userStatus = await DatabaseService().getStatus();
+    setState(() {});
   }
 
   @override
