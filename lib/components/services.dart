@@ -158,72 +158,86 @@ class menuListing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isAvailable = menu.inStock;
+
     if (menu.Shop_ID != shopId) {
       return Container();
     }
 
-    return GestureDetector(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            ListTile(
-              leading: ClipOval(
-                child: Image.network(
-                  menu.Icon,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+    return IgnorePointer(
+      ignoring: !isAvailable,
+      child: GestureDetector(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            children: [
+              ListTile(
+                tileColor: isAvailable ? null : Color.fromARGB(35, 56, 34, 15),
+                leading: ClipOval(
+                  child: Image.network(
+                    menu.Icon,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              title: Text(
-                menu.Name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                title: Text(
+                  menu.Name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              subtitle: Row(
-                children: [
-                  Text(
-                    menu.Description,
-                    style: const TextStyle(
-                      fontSize: 8,
-                      fontFamily: 'Roboto',
+                subtitle: Row(
+                  children: [
+                    Text(
+                      menu.Description,
+                      style: const TextStyle(
+                        fontSize: 8,
+                        fontFamily: 'Roboto',
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                trailing: isAvailable
+                    ? Column(
+                        children: [
+                          SizedBox(
+                            width: 70,
+                            height: 30,
+                            child: Quantity(
+                              name: menu.Name,
+                              food_id: menu.ID,
+                              shop_id: shopId,
+                              initialSubtotal: menu.Price,
+                              randomid: randomId,
+                              updateTotalQuantity: updateTotalQuantity,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'RM${menu.Price}',
+                            style: const TextStyle(
+                              color: Color(0xFFB3B3B3),
+                              fontSize: 10,
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Text(
+                        'UNAVAILABLE',
+                        style: TextStyle(
+                          color: Color(0xFFB3B3B3),
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
               ),
-              trailing: Column(
-                children: [
-                  SizedBox(
-                    width: 70,
-                    height: 30,
-                    child: Quantity(
-                      name: menu.Name,
-                      food_id: menu.ID,
-                      shop_id: shopId,
-                      initialSubtotal: menu.Price,
-                      randomid: randomId,
-                      updateTotalQuantity: updateTotalQuantity,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'RM${menu.Price}',
-                    style: const TextStyle(
-                      color: Color(0xFFB3B3B3),
-                      fontSize: 10,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

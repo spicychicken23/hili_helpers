@@ -411,7 +411,6 @@ class DatabaseService {
       List<Map<String, dynamic>> topItems = itemMap.values.toList();
 
       topItems.sort((a, b) => b['quantity'].compareTo(a['quantity']));
-      print(topItems);
       return topItems.take(3).toList();
     } catch (e) {
       return [];
@@ -461,6 +460,100 @@ class DatabaseService {
       }
     } catch (error) {
       print('Error updating shop status: $error');
+    }
+  }
+
+  Future<String> getHelperShopId() async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('fnbLists')
+          .where('Owner', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        Map<String, dynamic>? userData =
+            docSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          String? shopId = userData['ID'] as String?;
+          if (shopId != null) {
+            return shopId;
+          } else {
+            print('Shop ID is null.');
+          }
+        } else {
+          print('User data is null.');
+        }
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+    return 'null';
+  }
+
+  Future<bool?> getStockStatus(String itemId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Menu')
+          .where('ID', isEqualTo: itemId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        bool open = docSnapshot['inStock'] ?? false;
+        return open;
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error fetching shop status: $error');
+    }
+    return null;
+  }
+
+  Future<void> toggleStockStatus(bool status, String itemId) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('Menu')
+          .where('ID', isEqualTo: itemId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        String docId = docSnapshot.id;
+
+        await _firestore.collection('Menu').doc(docId).update({
+          'inStock': status,
+        });
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error updating shop status: $error');
+    }
+  }
+
+  Future<void> deleteStock(String itemId) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('Menu')
+          .where('ID', isEqualTo: itemId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        String docId = docSnapshot.id;
+
+        await _firestore.collection('Menu').doc(docId).delete();
+      } else {
+        print('Menu document does not exist.');
+      }
+    } catch (error) {
+      print('Error deleting stock: $error');
     }
   }
 }

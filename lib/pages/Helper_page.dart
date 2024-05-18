@@ -66,8 +66,7 @@ class _HelperPageState extends State<HelperPage> {
                       children: <Widget>[
                         GestureDetector(
                           onTap: () {
-                            Navigator.popUntil(
-                                context, ModalRoute.withName(HomePage.id));
+                            Navigator.pop(context);
                           },
                           child: const Icon(Icons.chevron_left),
                         ),
