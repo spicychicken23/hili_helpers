@@ -149,25 +149,50 @@ class _HelperNaviBarState extends State<HelperNaviBar> {
   }
 }
 
-class SwitchExample extends StatefulWidget {
-  const SwitchExample({super.key});
+class shopStatus extends StatefulWidget {
+  const shopStatus({super.key});
 
   @override
-  State<SwitchExample> createState() => _SwitchExampleState();
+  State<shopStatus> createState() => _shopStatusState();
 }
 
-class _SwitchExampleState extends State<SwitchExample> {
-  bool light = true;
+class _shopStatusState extends State<shopStatus> {
+  late bool light;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchShopStatus();
+  }
+
+  Future<void> _fetchShopStatus() async {
+    bool? shopStatus = await DatabaseService().getShopStatus();
+    setState(() {
+      light = shopStatus ?? false;
+    });
+  }
+
   Widget build(BuildContext context) {
-    return Switch(
-      value: light,
-      activeColor: Colors.green,
-      onChanged: (bool value) {
-        setState(() {
-          light = value;
-        });
+    return FutureBuilder<bool?>(
+      future: DatabaseService().getShopStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return Switch(
+            value: snapshot.data ?? false,
+            activeColor: Colors.green,
+            onChanged: (bool value) {
+              setState(() {
+                light = value;
+                DatabaseService().toggleShopStatus(value);
+                _fetchShopStatus();
+              });
+            },
+          );
+        }
       },
     );
   }
@@ -239,7 +264,9 @@ class statsCard extends StatelessWidget {
 }
 
 class PopularItems extends StatelessWidget {
-  const PopularItems({Key? key}) : super(key: key);
+  const PopularItems({Key? key, this.sales, this.quantities}) : super(key: key);
+  final double? sales;
+  final int? quantities;
 
   @override
   Widget build(BuildContext context) {
@@ -274,14 +301,39 @@ class PopularItems extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text(
-                        "Quantity: ${item['quantity']}",
-                        style: const TextStyle(
-                          fontSize: 8,
-                        ),
+                      subtitle: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Quantity sold: ${item['quantity']}",
+                            style: const TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                          Text(
+                            "[${((item['quantity'] / quantities) * 100).toStringAsFixed(0)} %]",
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Total sales: ${item['total']}",
+                            style: const TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                          Text(
+                            "[${((item['total'] / sales) * 100).toStringAsFixed(0)} %]",
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const Divider(),
                   ],
                 );
               }).toList(),

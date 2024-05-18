@@ -377,35 +377,90 @@ class DatabaseService {
 
   Future<List<Map<String, dynamic>>> getTopProducts() async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      return [];
+    }
 
     try {
-      List<Map<String, dynamic>> topItems = [];
+      Map<String, Map<String, dynamic>> itemMap = {};
 
-      for (int i = 0;; i++) {
-        String documentId = '${userId}_$i';
-        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-            .collection('Items')
-            .doc(documentId)
-            .get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Items')
+          .where('ownerId', isEqualTo: userId)
+          .get();
 
-        if (!documentSnapshot.exists) {
-          break;
+      for (var document in querySnapshot.docs) {
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+        String itemName = data['itemName'];
+        int quantity = data['quantity'];
+        double total = data['total'];
+
+        if (itemMap.containsKey(itemName)) {
+          itemMap[itemName]!['quantity'] += quantity;
+          itemMap[itemName]!['total'] += total;
+        } else {
+          itemMap[itemName] = {
+            'itemName': itemName,
+            'quantity': quantity,
+            'total': total,
+          };
         }
-
-        Map<String, dynamic> data =
-            documentSnapshot.data() as Map<String, dynamic>;
-
-        topItems.add({
-          'itemName': data['itemName'],
-          'quantity': data['quantity'],
-        });
       }
+
+      List<Map<String, dynamic>> topItems = itemMap.values.toList();
 
       topItems.sort((a, b) => b['quantity'].compareTo(a['quantity']));
       print(topItems);
       return topItems.take(3).toList();
     } catch (e) {
       return [];
+    }
+  }
+
+  Future<bool?> getShopStatus() async {
+    String? userId = _auth.currentUser?.uid;
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('fnbLists')
+          .where('Owner', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        bool open = docSnapshot['open'] ?? false;
+        return open;
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error fetching shop status: $error');
+    }
+    return null;
+  }
+
+  Future<void> toggleShopStatus(bool status) async {
+    String? userId = _auth.currentUser?.uid;
+
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('fnbLists')
+          .where('Owner', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        String docId = docSnapshot.id;
+
+        await _firestore.collection('fnbLists').doc(docId).update({
+          'open': status,
+        });
+      } else {
+        print('User document does not exist.');
+      }
+    } catch (error) {
+      print('Error updating shop status: $error');
     }
   }
 }

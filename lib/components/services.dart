@@ -67,67 +67,75 @@ PageInfo getPageInfo(String pageType) {
 
 class servicesListing extends StatelessWidget {
   const servicesListing({Key? key, required this.fnbs}) : super(key: key);
-
   final fnb fnbs;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        String pageType = fnbs.ID.substring(0, 3);
+    bool isOpen = fnbs.open;
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FnbDetailsPage(Fnb: fnbs, pageType: pageType),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            ListTile(
-              leading: ClipOval(
-                child: Image.network(
-                  fnbs.Icon,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              title: Text(
-                fnbs.Name,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Row(
-                children: [
-                  const Icon(
-                    Icons.star,
-                    size: 12,
-                    color: Color(0xFFD3A877),
+    return IgnorePointer(
+      ignoring: !isOpen,
+      child: GestureDetector(
+        onTap: isOpen
+            ? () {
+                String pageType = fnbs.ID.substring(0, 3);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        FnbDetailsPage(Fnb: fnbs, pageType: pageType),
                   ),
-                  Text(
-                    fnbs.Rating.toString(),
-                    style: const TextStyle(
-                      fontSize: 8,
-                      fontFamily: 'Roboto',
+                );
+              }
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            children: [
+              ListTile(
+                tileColor: isOpen ? null : Color.fromARGB(35, 56, 34, 15),
+                leading: ClipOval(
+                  child: Image.network(
+                    fnbs.Icon,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                title: Text(
+                  fnbs.Name,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 12,
+                      color: Color(0xFFD3A877),
                     ),
+                    Text(
+                      fnbs.Rating.toString(),
+                      style: const TextStyle(
+                        fontSize: 8,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: Text(
+                  isOpen ? fnbs.Category : 'CLOSED',
+                  style: const TextStyle(
+                    color: Color(0xFFB3B3B3),
+                    fontFamily: 'Roboto',
                   ),
-                ],
-              ),
-              trailing: Text(
-                fnbs.Category,
-                style: const TextStyle(
-                  color: Color(0xFFB3B3B3),
-                  fontFamily: 'Roboto',
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

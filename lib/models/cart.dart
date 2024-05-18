@@ -48,10 +48,11 @@ class cart {
         FirebaseFirestore.instance.collection('Items');
 
     for (var i = 0; i < items.length; i++) {
-      await itemsCollection.doc('${userId}_$i').set({
+      await itemsCollection.doc('${userId}_${items[i].randomid}_$i').set({
+        'ownerId': userId,
         'itemName': items[i].name,
         'quantity': items[i].quantity,
-        'randomId': items[i].randomid,
+        'total': items[i].subtotal,
       });
     }
   }

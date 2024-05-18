@@ -85,7 +85,7 @@ class _HelperPageState extends State<HelperPage> {
                         ),
                       ),
                       Spacer(),
-                      SwitchExample()
+                      shopStatus()
                     ])
                   ],
                 ),
@@ -95,7 +95,7 @@ class _HelperPageState extends State<HelperPage> {
               ),
               const HelperNaviBar(),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               const Divider(),
               const SizedBox(
@@ -137,10 +137,26 @@ class _HelperPageState extends State<HelperPage> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: PopularItems(),
+              const SizedBox(
+                height: 10,
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Popular Items",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(),
+                    PopularItems(sales: salesData, quantities: quantitySold),
+                  ],
+                ),
+              )
             ],
           ),
         ),
