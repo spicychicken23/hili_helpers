@@ -18,7 +18,7 @@ class ActPage extends StatefulWidget {
 
 class _ActPageState extends State<ActPage> {
   int _currentIndex = 1;
-  final DatabaseService _databaseService = DatabaseService();
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
@@ -58,8 +58,7 @@ class _ActPageState extends State<ActPage> {
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
           ),
-          content: 
-            FutureBuilder<String?>(
+          content: FutureBuilder<String?>(
             future: DatabaseService().getShopName(order.shop_Id),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -104,9 +103,9 @@ class _ActPageState extends State<ActPage> {
                     ),
                     if (isHistory) ...[
                       const SizedBox(height: 8),
-                      const Divider(thickness: 2, color: Colors.black),
+                      Divider(thickness: 2, color: Colors.black),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Rate the Seller:',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -128,32 +127,6 @@ class _ActPageState extends State<ActPage> {
                           );
                         }),
                       ),
-                      FutureBuilder<String?>(
-                        future: _databaseService.getRate(order.randomId.toString()),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text('Error fetching rating');
-                          } else {
-                            String? rating = snapshot.data;
-                            return Text(
-                              textAlign: TextAlign.center,
-                              "You've rated ${rating ?? 'Not Rated'}/5.",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            );
-                          }
-                        },
-                      )
-                      // Text(
-                      //   "You've rated ${ _databaseService.getRate(order.randomId.toString())}/5.",
-                      //   style: const TextStyle(
-                      //   color: Colors.black,
-                      // ),
-                      // )
                     ],
                   ],
                 );

@@ -556,4 +556,77 @@ class DatabaseService {
       print('Error deleting stock: $error');
     }
   }
+
+  Future<void> rateOrder(int cartId, double rating) async {
+  try {
+    final querySnapshot = await _cartListsRef
+        .where('random-Id', isEqualTo: cartId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final doc = querySnapshot.docs.first;
+      await doc.reference.update({'Rated': rating});
+    } else {
+      print('No cart found with ID: $cartId');
+    }
+  } catch (error) {
+    print('Error rating order: $error');
+    throw error;
+  }
 }
+
+  Future<void> saveRating(String orderId, double rating) async {
+    try {
+      await _cartListsRef.doc(orderId).update({'Rated': rating});
+    } catch (e) {
+      print('Error saving rating: $e');
+    }
+  }
+
+//   Future<String?> getRate(String cartID) async {
+//   try {
+//     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+//         .collection('CartList')
+//         .doc(cartID)  // Assuming orderId is the document ID you want to fetch
+//         .get();
+
+//     if (documentSnapshot.exists) {
+//       var data = documentSnapshot.data() as Map<String, dynamic>;
+//       int? ratedValue = data['Rated'] as int?;
+//       return ratedValue != null ? ratedValue.toString() : 'Rated Not Found';
+//     } else {
+//       print('Document not found with ID: $cartID');
+//       return 'Rated Not Found';
+//     }
+//   } catch (error) {
+//     print('Error fetching document data: $error');
+//     throw error;
+//   }
+// }
+
+
+  Future<String?> getRate(String orderId) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _cartListsRef.where('cart_Id', isEqualTo: orderId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String? shopName = rateData['Rated'] as String?;
+        if (shopName != null) {
+          return shopName;
+        }
+      } else {
+        print('No shop found with ID: $orderId');
+      }
+
+      return 'Rated Not Found';
+    } catch (error) {
+      print('Error fetching shop data: $error');
+      throw error;
+    }
+  }
+}
+
+
+  
