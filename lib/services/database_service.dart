@@ -605,22 +605,22 @@ class DatabaseService {
 // }
 
 
-  Future<String?> getRate(String orderId) async {
+  Future<int?> getRate(int orderId) async {
     try {
       QuerySnapshot querySnapshot =
-          await _cartListsRef.where('cart_Id', isEqualTo: orderId).get();
+          await _cartListsRef.where('random-Id', isEqualTo: orderId).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        String? shopName = rateData['Rated'] as String?;
+        int? shopName = rateData['Rated'] ;
         if (shopName != null) {
           return shopName;
         }
       } else {
         print('No shop found with ID: $orderId');
       }
-
-      return 'Rated Not Found';
+      print ('not found');
+      return null;
     } catch (error) {
       print('Error fetching shop data: $error');
       throw error;

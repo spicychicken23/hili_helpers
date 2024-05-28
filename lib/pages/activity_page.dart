@@ -128,15 +128,15 @@ class _ActPageState extends State<ActPage> {
                           );
                         }),
                       ),
-                      FutureBuilder<String?>(
-                        future: _databaseService.getRate(order.randomId.toString()),
+                      FutureBuilder<int?>(
+                        future: _databaseService.getRate(order.randomId),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error fetching rating');
                           } else {
-                            String? rating = snapshot.data;
+                            int? rating = snapshot.data;
                             return Text(
                               textAlign: TextAlign.center,
                               "You've rated ${rating ?? 'Not Rated'}/5.",
