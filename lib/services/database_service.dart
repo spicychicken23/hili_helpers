@@ -582,29 +582,6 @@ class DatabaseService {
       print('Error saving rating: $e');
     }
   }
-
-//   Future<String?> getRate(String cartID) async {
-//   try {
-//     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-//         .collection('CartList')
-//         .doc(cartID)  // Assuming orderId is the document ID you want to fetch
-//         .get();
-
-//     if (documentSnapshot.exists) {
-//       var data = documentSnapshot.data() as Map<String, dynamic>;
-//       int? ratedValue = data['Rated'] as int?;
-//       return ratedValue != null ? ratedValue.toString() : 'Rated Not Found';
-//     } else {
-//       print('Document not found with ID: $cartID');
-//       return 'Rated Not Found';
-//     }
-//   } catch (error) {
-//     print('Error fetching document data: $error');
-//     throw error;
-//   }
-// }
-
-
   Future<int?> getRate(int orderId) async {
     try {
       QuerySnapshot querySnapshot =
@@ -612,9 +589,9 @@ class DatabaseService {
 
       if (querySnapshot.docs.isNotEmpty) {
         var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        int? shopName = rateData['Rated'] ;
-        if (shopName != null) {
-          return shopName;
+        int? rateValue = rateData['Rated'] ;
+        if (rateValue != null) {
+          return rateValue;
         }
       } else {
         print('No shop found with ID: $orderId');
@@ -626,6 +603,31 @@ class DatabaseService {
       throw error;
     }
   }
+
+  Future<bool> checkRate(int orderId) async {
+  try {
+    // Assuming _cartListsRef is a reference to the Firestore collection.
+    QuerySnapshot querySnapshot = await _cartListsRef
+        .where('orderId', isEqualTo: orderId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+      bool? rated = rateData['Rated'];
+      if (rated != null) {
+        return true;
+      }
+    } else {
+      print('No order found with ID: $orderId');
+    }
+    print('Rating not found');
+    return false;
+  } catch (error) {
+    print('Error fetching order data: $error');
+    throw error;
+  }
+}
+
 }
 
 

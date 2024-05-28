@@ -1,5 +1,7 @@
 //working fine but less attractive
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/activity.dart';
 import 'package:hili_helpers/models/cart.dart';
@@ -19,6 +21,9 @@ class ActPage extends StatefulWidget {
 class _ActPageState extends State<ActPage> {
   int _currentIndex = 1;
   final DatabaseService _databaseService = DatabaseService();
+  int? globalRated;
+  
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
@@ -51,6 +56,7 @@ class _ActPageState extends State<ActPage> {
         // Format the order date to display only minutes
         String formattedOrderDate = DateFormat('yyyy-MM-dd HH:mm').format(order.order_date.toDate());
         double rating = 0; // initial rating
+
 
         return AlertDialog(
           title: const Text(
@@ -106,28 +112,6 @@ class _ActPageState extends State<ActPage> {
                       const SizedBox(height: 8),
                       const Divider(thickness: 2, color: Colors.black),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Rate the Seller:',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(5, (index) {
-                          return IconButton(
-                            icon: Icon(
-                              index < rating ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                rating = index + 1;
-                              });
-                            },
-                          );
-                        }),
-                      ),
                       FutureBuilder<int?>(
                         future: _databaseService.getRate(order.randomId),
                         builder: (context, snapshot) {
@@ -136,15 +120,50 @@ class _ActPageState extends State<ActPage> {
                           } else if (snapshot.hasError) {
                             return Text('Error fetching rating');
                           } else {
-                            int? rating = snapshot.data;
-                            return Text(
-                              textAlign: TextAlign.center,
-                              "You've rated ${rating ?? 'Not Rated'}/5.",
+                          //rated is Rated value retrieve from the current database
+                          //rating is just a initial value
+                          //globalRated is used for outside method
+                          int? rated = snapshot.data;
+                          globalRated = rated ?? 0;
+                            if (rated == null) {
+                              return Column(
+                                children: [
+                                  const Text(
+                                    'Rate the Seller:',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(5, (index) {
+                                      return IconButton(
+                                        icon: Icon(
+                                          index < rating ? Icons.star : Icons.star_border,
+                                          color: Colors.amber,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            rating = index + 1;
+                                          });
+                                          _databaseService.rateOrder(order.randomId, index + 1);
+                                        },
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              );
+                            } else {
+
+                              return Text(
+                              "You've rated $rated/5.",
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 12,
                               ),
+                              textAlign: TextAlign.center,
                             );
+                            }
                           }
                         },
                       )
@@ -172,14 +191,38 @@ class _ActPageState extends State<ActPage> {
                 ),
               ),
             ),
-            if (isHistory)
-              TextButton(
-                onPressed: () {
-                  DatabaseService().rateOrder(order.randomId, rating);
-                  Navigator.pop(context);
-                },
-                child: const Text('Submit'),
-              ),
+            // FutureBuilder<bool?>(
+            //   future: _databaseService.checkRate(order.randomId),
+            //   builder: (context, snapshot) {
+            //     if (snapshot.connectionState == ConnectionState.waiting) {
+            //       return CircularProgressIndicator();
+            //     } else if (snapshot.hasError) {
+            //       return Text('Error checking rating');
+            //     } else {
+            //       bool? hasRated = snapshot.data;
+            //       if (isHistory && hasRated == false) {
+            //         return TextButton(
+            //           onPressed: () {
+            //             DatabaseService().rateOrder(order.randomId, rating);
+            //             Navigator.pop(context);
+            //           },
+            //           child: const Text('Submit'),
+            //         );
+            //       } else {
+            //         return SizedBox(); // Placeholder widget when Submit button is not shown
+            //       }
+            //     }
+            //   },
+            // ),
+            //use this one 
+            // if(isHistory)
+            //   TextButton(
+            //     onPressed: () {
+            //       DatabaseService().rateOrder(order.randomId, rating);
+            //       Navigator.pop(context);
+            //     },
+            //     child: const Text('Submit'),
+            //   ),
           ],
         );
       },
