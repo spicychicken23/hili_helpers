@@ -147,9 +147,18 @@ class _ActPageState extends State<ActPage> {
                                             rating = index + 1;
                                           });
                                           _databaseService.rateOrder(order.randomId, index + 1);
+                                          _databaseService.updateFnbRating(order.shop_Id);
+                                          //update fnbLists rate dengan based on the rate the 
+                                          //loop - switch (rating ) Rate_4++
+                                          //
                                         },
                                       );
                                     }),
+                                  ),
+                                  const Text(
+                                    'Notes: Make Sure Double Click the Star',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize:10,),
                                   ),
                                 ],
                               );
@@ -167,12 +176,6 @@ class _ActPageState extends State<ActPage> {
                           }
                         },
                       )
-                      // Text(
-                      //   "You've rated ${ _databaseService.getRate(order.randomId.toString())}/5.",
-                      //   style: const TextStyle(
-                      //   color: Colors.black,
-                      // ),
-                      // )
                     ],
                   ],
                 );
@@ -191,38 +194,6 @@ class _ActPageState extends State<ActPage> {
                 ),
               ),
             ),
-            // FutureBuilder<bool?>(
-            //   future: _databaseService.checkRate(order.randomId),
-            //   builder: (context, snapshot) {
-            //     if (snapshot.connectionState == ConnectionState.waiting) {
-            //       return CircularProgressIndicator();
-            //     } else if (snapshot.hasError) {
-            //       return Text('Error checking rating');
-            //     } else {
-            //       bool? hasRated = snapshot.data;
-            //       if (isHistory && hasRated == false) {
-            //         return TextButton(
-            //           onPressed: () {
-            //             DatabaseService().rateOrder(order.randomId, rating);
-            //             Navigator.pop(context);
-            //           },
-            //           child: const Text('Submit'),
-            //         );
-            //       } else {
-            //         return SizedBox(); // Placeholder widget when Submit button is not shown
-            //       }
-            //     }
-            //   },
-            // ),
-            //use this one 
-            // if(isHistory)
-            //   TextButton(
-            //     onPressed: () {
-            //       DatabaseService().rateOrder(order.randomId, rating);
-            //       Navigator.pop(context);
-            //     },
-            //     child: const Text('Submit'),
-            //   ),
           ],
         );
       },

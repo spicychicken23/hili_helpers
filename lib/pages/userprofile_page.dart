@@ -4,8 +4,6 @@ import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import 'account_info_page.dart';
-import 'package:hili_helpers/components/auth.dart';
-
 Future<void> signOut(BuildContext context) async {
   await Auth().signOut();
   Navigator.pushReplacementNamed(context, FrontPage.id);
