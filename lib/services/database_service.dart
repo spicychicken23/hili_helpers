@@ -678,6 +678,9 @@ Future<void> updateFnbRating(String shopId) async {
       // Calculate average rating
       double rating = totalRaters != 0 ? (rate1 + rate2 * 2 + rate3 * 3 + rate4 * 4 + rate5 * 5) / totalRaters : 0;
 
+      //2 decimal point only
+      rating.toStringAsFixed(2);
+
       // Update FnbList with calculated rates and rating
       QuerySnapshot fnbListSnapshot = await _fnbListsRef.where('ID', isEqualTo: shopId).get();
       if (fnbListSnapshot.docs.isNotEmpty) {
