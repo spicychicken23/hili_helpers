@@ -3,9 +3,7 @@ import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
-// ignore: unused_import
-import 'account_info_page.dart'; // Import the renamed account file
-
+import 'account_info_page.dart';
 Future<void> signOut(BuildContext context) async {
   await Auth().signOut();
   Navigator.pushReplacementNamed(context, FrontPage.id);
@@ -20,15 +18,10 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  final DatabaseService _databaseService = DatabaseService();
   int _currentIndex = 3;
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  late String? userStatus = 'User';
+  String? userStatus = 'User';
+  String? userName = 'User';
 
   @override
   void initState() {
@@ -37,8 +30,15 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future<void> _fetchUserData() async {
-    userStatus = await DatabaseService().getStatus();
+    userStatus = await _databaseService.getStatus();
+    userName = await _databaseService.getUsersName();
     setState(() {});
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -60,7 +60,8 @@ class _AccountPageState extends State<AccountPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ContactInfoPage()),
+                  builder: (context) => const ContactInfoPage(),
+                ),
               );
             },
             child: Center(
@@ -81,11 +82,16 @@ class _AccountPageState extends State<AccountPage> {
             ),
           ),
           const SizedBox(height: 20),
-          const Center(child: Text('User Name')),
+          StreamBuilder<Object>(
+            stream: null,
+            builder: (context, snapshot) {
+              return Center(child: Text(userName ?? 'Loading...'));
+            }
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              //contact info
+              // Contact Info
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.contact_page),
@@ -95,12 +101,12 @@ class _AccountPageState extends State<AccountPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ContactInfoPage()),
+                      builder: (context) => const ContactInfoPage(),
+                    ),
                   );
                 },
               ),
-
-              //joined us
+              // Joined Us
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.group_add),
@@ -110,7 +116,7 @@ class _AccountPageState extends State<AccountPage> {
                   // Add your action here
                 },
               ),
-              //settings
+              // Settings
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 leading: const Icon(Icons.settings_applications_rounded),
@@ -122,8 +128,7 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ],
           ),
-
-          //logout
+          // Logout
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             leading: const Icon(Icons.logout_sharp),

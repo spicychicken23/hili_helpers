@@ -5,7 +5,7 @@ import 'package:hili_helpers/services/database_service.dart';
 
 class actHistory extends StatelessWidget {
   const actHistory(
-      {Key? key, required this.order, required this.databaseService})
+      {Key? key, required this.order, required this.databaseService, double? rating})
       : super(key: key);
 
   final cart order;
@@ -116,7 +116,7 @@ class actOnGoing extends StatelessWidget {
             padding: EdgeInsets.only(right: 15),
             child: Text(
               _getStatus(order.order_date),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

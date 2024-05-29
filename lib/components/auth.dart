@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? get currentUser => _firebaseAuth.currentUser;
-
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   Future<void> signInWithEmailAndPassword({
@@ -39,6 +39,20 @@ class Auth {
       email: email,
       password: password,
     );
+  }
+
+  //get current user ID
+  String? getCurrentUserId() {
+    return _firebaseAuth.currentUser?.uid;
+  }
+
+  Future<String?> get userName async {
+    String? currentUserId = getCurrentUserId();
+    if (currentUserId != null) {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUserId).get();
+      return userDoc.get('name');
+    }
+    return null;
   }
 
   Future<void> signOut() async {
