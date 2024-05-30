@@ -155,6 +155,13 @@ class _AccountPageState extends State<AccountPage> {
                           prefix = 'GEN';
                       }
 
+                      // Update user status to helper
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .update({'status': 'Helper'});
+
+                      // Add helper entry to fnbLists collection
                       await FirebaseFirestore.instance
                           .collection('fnbLists')
                           .add({
@@ -170,8 +177,14 @@ class _AccountPageState extends State<AccountPage> {
                         'Rate_3': 0,
                         'Rate_4': 0,
                         'Rate_5': 0,
-                        'Icon': '',
+                        'Icon':
+                            'https://drive.usercontent.google.com/download?id=1YH1ek_Zo6bNo74so1Nr5c4KQRkoPQjIx',
                         'open': false,
+                        'status': 'Helper',
+                      });
+
+                      setState(() {
+                        userStatus = 'Helper';
                       });
                     }
                     Navigator.of(context).pop();

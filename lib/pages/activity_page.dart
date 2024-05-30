@@ -6,7 +6,6 @@ import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import 'package:intl/intl.dart';
 
-
 class ActPage extends StatefulWidget {
   ActPage({super.key});
   static String id = 'ACT_page';
@@ -68,86 +67,94 @@ class _ActPageState extends State<ActPage> {
   //   );
   // }
   void _showOrderDetails(BuildContext context, cart order) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      // Format the total with 2 decimal places
-      String formattedTotal = order.subtotal.toStringAsFixed(2);
-      // Format the order date to display only minutes
-      String formattedOrderDate = DateFormat('yyyy-MM-dd HH:mm').format(order.order_date.toDate());
-      //Future<String?> shopName = DatabaseService().getShopName(order.shop_Id);
+    showDialog(
+      context: context,
+      builder: (context) {
+        // Format the total with 2 decimal places
+        String formattedTotal = order.subtotal.toStringAsFixed(2);
+        // Format the order date to display only minutes
+        String formattedOrderDate =
+            DateFormat('yyyy-MM-dd HH:mm').format(order.order_date.toDate());
+        //Future<String?> shopName = DatabaseService().getShopName(order.shop_Id);
 
-      return AlertDialog(
-        title: const Text(
-          'Order Details',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30,),),
-        content: FutureBuilder<String?>(
-          future: DatabaseService().getShopName(order.shop_Id),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              String? shopName = snapshot.data ?? 'Unknown';  
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Divider(
-              color: Colors.grey, // Set the color of the divider
-              thickness: 2, // Set the thickness of the divider
+        return AlertDialog(
+          title: const Text(
+            'Order Details',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
             ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                //'FNB ID: ${order.shop_Id}',
-                '${shopName}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+          ),
+          content: FutureBuilder<String?>(
+            future: DatabaseService().getShopName(order.shop_Id),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                String? shopName = snapshot.data ?? 'Unknown';
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Divider(
+                      color: Colors.grey, // Set the color of the divider
+                      thickness: 2, // Set the thickness of the divider
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        //'FNB ID: ${order.shop_Id}',
+                        '${shopName}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Cart ID: ${order.randomId}',
+                      //style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Order Date: $formattedOrderDate',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Quantity: ${order.quantity}',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Total : RM$formattedTotal',
+                      style: const TextStyle(
+                          color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Close',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 228, 159, 82),
+                  fontFamily: 'DM Sans',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Cart ID: ${order.randomId}',
-              //style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Order Date: $formattedOrderDate',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Quantity: ${order.quantity}',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Total : RM$formattedTotal',
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ],
         );
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close',style: TextStyle(
-              color:  Color.fromARGB(255, 228, 159, 82),
-              fontFamily: 'DM Sans',
-              fontWeight: FontWeight.bold,
-            ),),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,26 +230,27 @@ class _ActPageState extends State<ActPage> {
                           // );
 
                           // new version
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: true,
-                                itemCount: snapshot.data!.length,
-                                itemBuilder: (context, index) {
-                                  final order = snapshot.data![index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        _showOrderDetails(context, order);
-                                      },
-                                      child: actOnGoing(
-                                        databaseService: DatabaseService(),
-                                        order: order,
-                                      ),
-                                    ),
-                                  );
-                                },
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              final order = snapshot.data![index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showOrderDetails(context, order);
+                                  },
+                                  child: actOnGoing(
+                                    databaseService: DatabaseService(),
+                                    order: order,
+                                  ),
+                                ),
                               );
+                            },
+                          );
                         },
                       ),
                     ),
