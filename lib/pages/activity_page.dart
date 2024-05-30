@@ -21,7 +21,7 @@ class ActPage extends StatefulWidget {
 class _ActPageState extends State<ActPage> {
   int _currentIndex = 1;
   final DatabaseService _databaseService = DatabaseService();
-  int? globalRated;
+  double? globalRated;
   
 
   void _onPageChanged(int index) {
@@ -112,7 +112,7 @@ class _ActPageState extends State<ActPage> {
                       const SizedBox(height: 8),
                       const Divider(thickness: 2, color: Colors.black),
                       const SizedBox(height: 8),
-                      FutureBuilder<int?>(
+                      FutureBuilder<double?>(
                         future: _databaseService.getRate(order.randomId),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -123,7 +123,7 @@ class _ActPageState extends State<ActPage> {
                           //rated is Rated value retrieve from the current database
                           //rating is just a initial value
                           //globalRated is used for outside method
-                          int? rated = snapshot.data;
+                          double? rated = snapshot.data;
                           globalRated = rated ?? 0;
                             if (rated == null) {
                               return Column(

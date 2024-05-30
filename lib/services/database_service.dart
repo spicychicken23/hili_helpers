@@ -585,14 +585,14 @@ class DatabaseService {
     }
   }
 
-  Future<int?> getRate(int orderId) async {
+  Future<double?> getRate(int orderId) async {
     try {
       QuerySnapshot querySnapshot =
           await _cartListsRef.where('random-Id', isEqualTo: orderId).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        int? rateValue = rateData['Rated'] ;
+        double? rateValue = rateData['Rated'] ;
         if (rateValue != null) {
           return rateValue;
         }
@@ -705,6 +705,10 @@ Future<void> updateFnbRating(String shopId) async {
     throw error;
   }
 }
+  Future<String?> getUserEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user?.email;
+  }
 }
 
 

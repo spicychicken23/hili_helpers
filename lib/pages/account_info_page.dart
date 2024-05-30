@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hili_helpers/components/auth.dart';
-//import 'package:hili_helpers/services/database_service.dart';
+import 'package:hili_helpers/services/database_service.dart';
 
 class ContactInfoPage extends StatefulWidget {
   const ContactInfoPage({Key? key});
@@ -20,7 +20,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   final Auth _auth = Auth();
 
   // Instance for database services
-  //final DatabaseService _databaseService = DatabaseService(); 
+  final DatabaseService _databaseService = DatabaseService();
+  //Future<String?> email = _databaseService.getUserEmail();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthdateController = TextEditingController();
@@ -41,6 +42,7 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   Future<void> _loadUserData() async {
     // Get the current user ID
     String? currentUserId = _auth.getCurrentUserId();
+    Future<String?> email = _databaseService.getUserEmail();
 
     if (currentUserId != null) {
       // Get the user's document from Firestore
@@ -121,9 +123,10 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
     );
   }
 
-  //
+  
   @override
   Widget build(BuildContext context) {
+    Future<String?> email = _databaseService.getUserEmail();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -201,7 +204,9 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
           // Email
           ListTile(
             leading: const Icon(Icons.email),
-            title: const Text('Email'),
+            title:const Text(
+              'Email'
+            ),
             subtitle: Text(_emailController.text),
             trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
             onTap: () {
