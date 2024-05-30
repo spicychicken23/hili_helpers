@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/helper.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/services/database_service.dart';
+import 'add_menuitem.dart';
 
 class HelperStocksPage extends StatefulWidget {
   HelperStocksPage({super.key});
@@ -55,9 +56,9 @@ class _HelperStocksPageState extends State<HelperStocksPage> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    const Row(
+                    Row(
                       children: <Widget>[
-                        Text(
+                        const Text(
                           'Stocks',
                           style: TextStyle(
                             color: Color(0xFF000000),
@@ -66,8 +67,34 @@ class _HelperStocksPageState extends State<HelperStocksPage> {
                             fontFamily: 'DM Sans',
                           ),
                         ),
-                        Spacer(),
-                        Icon(Icons.add_box_rounded)
+                        const Spacer(),
+                        FutureBuilder<String>(
+                          future: shopIdFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              String shopId = snapshot.data!;
+                              return IconButton(
+                                icon: const Icon(Icons.add_box_rounded),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddMenuItemPage(shopId: shopId),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return const Text('Unable to load data');
+                            }
+                          },
+                        ),
                       ],
                     ),
                     const SizedBox(
