@@ -436,6 +436,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
             randomid: cartData['random_id'],
             quantity: cartData['quantity'],
             subtotal: cartData['subtotal'],
+            rated: cartData['Rated'],
           );
           items.add(cartItem);
           setState(() {
