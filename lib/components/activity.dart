@@ -162,3 +162,4 @@ String _getIcon(String shopId) {
     return 'lib/images/EDU ICON.png';
   }
 }
+

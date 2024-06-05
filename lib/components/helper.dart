@@ -356,15 +356,30 @@ class ShopRatings extends StatelessWidget {
                   Column(
                     children: [
                       ratingBar(
-                          '5', int.parse(ratings[2]) / int.parse(ratings[1])),
+                          '5',
+                          int.parse(ratings[2]) == 0
+                              ? 0
+                              : int.parse(ratings[2]) / int.parse(ratings[1])),
                       ratingBar(
-                          '4', int.parse(ratings[3]) / int.parse(ratings[1])),
+                          '4',
+                          int.parse(ratings[3]) == 0
+                              ? 0
+                              : int.parse(ratings[3]) / int.parse(ratings[1])),
                       ratingBar(
-                          '3', int.parse(ratings[4]) / int.parse(ratings[1])),
+                          '3',
+                          int.parse(ratings[4]) == 0
+                              ? 0
+                              : int.parse(ratings[4]) / int.parse(ratings[1])),
                       ratingBar(
-                          '2', int.parse(ratings[5]) / int.parse(ratings[1])),
+                          '2',
+                          int.parse(ratings[5]) == 0
+                              ? 0
+                              : int.parse(ratings[5]) / int.parse(ratings[1])),
                       ratingBar(
-                          '1', int.parse(ratings[6]) / int.parse(ratings[1])),
+                          '1',
+                          int.parse(ratings[6]) == 0
+                              ? 0
+                              : int.parse(ratings[6]) / int.parse(ratings[1])),
                     ],
                   ),
                 ],

@@ -21,15 +21,12 @@ class _FnbDetailsPageState extends State<FnbDetailsPage> {
   late int _randomId;
   int _totalQuantity = 0;
   late final PageInfo pageInfo = getPageInfo(widget.pageType);
-  //final DatabaseService _databaseService = DatabaseService();
 
   @override
   void initState() {
     super.initState();
     _randomId = Random().nextInt(1000000000);
     menuListsStream = DatabaseService().getMenuLists();
-    //_databaseService.updateFnbRating(widget.Fnb.ID);
-    //_databaseService.updateFnbRating("FNB001");
   }
 
   void updateTotalQuantity(int newQuantity, bool status) {
@@ -186,11 +183,31 @@ class _FnbDetailsPageState extends State<FnbDetailsPage> {
                       ),
                       Column(
                         children: [
-                          ratingBar('5', widget.Fnb.Rate_5 / widget.Fnb.Raters),
-                          ratingBar('4', widget.Fnb.Rate_4 / widget.Fnb.Raters),
-                          ratingBar('3', widget.Fnb.Rate_3 / widget.Fnb.Raters),
-                          ratingBar('2', widget.Fnb.Rate_2 / widget.Fnb.Raters),
-                          ratingBar('1', widget.Fnb.Rate_1 / widget.Fnb.Raters),
+                          ratingBar(
+                              '5',
+                              widget.Fnb.Rate_5 == 0
+                                  ? 0
+                                  : (widget.Fnb.Rate_5 / widget.Fnb.Raters)),
+                          ratingBar(
+                              '4',
+                              widget.Fnb.Rate_4 == 0
+                                  ? 0
+                                  : (widget.Fnb.Rate_4 / widget.Fnb.Raters)),
+                          ratingBar(
+                              '3',
+                              widget.Fnb.Rate_3 == 0
+                                  ? 0
+                                  : (widget.Fnb.Rate_3 / widget.Fnb.Raters)),
+                          ratingBar(
+                              '2',
+                              widget.Fnb.Rate_2 == 0
+                                  ? 0
+                                  : (widget.Fnb.Rate_2 / widget.Fnb.Raters)),
+                          ratingBar(
+                              '1',
+                              widget.Fnb.Rate_1 == 0
+                                  ? 0
+                                  : (widget.Fnb.Rate_1 / widget.Fnb.Raters)),
                         ],
                       ),
                       const SizedBox(

@@ -1,12 +1,8 @@
-//working fine but less attractive
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/activity.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/navigation.dart';
-import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import 'package:intl/intl.dart';
 

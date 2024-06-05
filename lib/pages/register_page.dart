@@ -31,7 +31,15 @@ class RegisterPage extends StatelessWidget {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
-            .set({});
+            .set({
+          'address': '',
+          'birthdate': '',
+          'email': email,
+          'gender': '',
+          'name': name,
+          'phoneNumber': '',
+          'status': '',
+        });
 
         // Navigate to login page after successful registration
         Navigator.pushNamed(context, LoginPage.id);

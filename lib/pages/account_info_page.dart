@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hili_helpers/components/auth.dart';
-import 'package:hili_helpers/services/database_service.dart';
 
 class ContactInfoPage extends StatefulWidget {
   const ContactInfoPage({Key? key});
@@ -20,7 +19,7 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   final Auth _auth = Auth();
 
   // Instance for database services
-  final DatabaseService _databaseService = DatabaseService();
+  //final DatabaseService _databaseService = DatabaseService();
   //Future<String?> email = _databaseService.getUserEmail();
 
   final TextEditingController _nameController = TextEditingController();
@@ -42,11 +41,12 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   Future<void> _loadUserData() async {
     // Get the current user ID
     String? currentUserId = _auth.getCurrentUserId();
-    Future<String?> email = _databaseService.getUserEmail();
+    //Future<String?> email = _databaseService.getUserEmail();
 
     if (currentUserId != null) {
       // Get the user's document from Firestore
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUserId).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(currentUserId).get();
 
       // Update text controllers with user data from Firestore
       setState(() {
@@ -82,7 +82,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
 
   // Get image
   Future<void> _getImage() async {
-    final pickedImage = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final pickedImage =
+        await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       setState(() {
@@ -123,10 +124,9 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
-    Future<String?> email = _databaseService.getUserEmail();
+    //Future<String?> email = _databaseService.getUserEmail();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -147,10 +147,14 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
                   onTap: _getImage,
                   child: CircleAvatar(
                     radius: 60,
-                    backgroundColor: const Color.fromARGB(255, 20, 64, 100).withOpacity(0.9),
+                    backgroundColor:
+                        const Color.fromARGB(255, 20, 64, 100).withOpacity(0.9),
                     child: _pickedImage == null
-                        ? const Icon(Icons.person, size: 60, color: Colors.white)
-                        : ClipOval(child: Image.file(_pickedImage!, fit: BoxFit.cover)),
+                        ? const Icon(Icons.person,
+                            size: 60, color: Colors.white)
+                        : ClipOval(
+                            child:
+                                Image.file(_pickedImage!, fit: BoxFit.cover)),
                   ),
                 ),
                 Positioned(
@@ -176,17 +180,14 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.person),
             title: const Text('Name'),
             subtitle: Text(_nameController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
-            onTap: () {
-              _showEditDialog('Name', _nameController);
-            },
           ),
           // Birthdate
           ListTile(
             leading: const Icon(Icons.cake),
             title: const Text('Birthdate'),
             subtitle: Text(_birthdateController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing:
+                const Icon(Icons.edit, color: Color(0xFFD3A877), size: 16),
             onTap: () {
               _showEditDialog('Birthdate', _birthdateController);
             },
@@ -196,7 +197,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.person_outline),
             title: const Text('Gender'),
             subtitle: Text(_genderController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing:
+                const Icon(Icons.edit, color: Color(0xFFD3A877), size: 16),
             onTap: () {
               _showEditDialog('Gender', _genderController);
             },
@@ -204,21 +206,16 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
           // Email
           ListTile(
             leading: const Icon(Icons.email),
-            title:const Text(
-              'Email'
-            ),
+            title: const Text('Email'),
             subtitle: Text(_emailController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
-            onTap: () {
-              _showEditDialog('Email', _emailController);
-            },
           ),
           // Phone Number
           ListTile(
             leading: const Icon(Icons.phone),
             title: const Text('Phone Number'),
             subtitle: Text(_phoneNumberController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing:
+                const Icon(Icons.edit, color: Color(0xFFD3A877), size: 16),
             onTap: () {
               _showEditDialog('Phone Number', _phoneNumberController);
             },
@@ -228,7 +225,8 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
             leading: const Icon(Icons.home),
             title: const Text('Address'),
             subtitle: Text(_addressController.text),
-            trailing: const Text('Change', style: TextStyle(color: Color(0xFFD3A877))),
+            trailing:
+                const Icon(Icons.edit, color: Color(0xFFD3A877), size: 16),
             onTap: () {
               _showEditDialog('Address', _addressController);
             },

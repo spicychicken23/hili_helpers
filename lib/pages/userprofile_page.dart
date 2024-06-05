@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/auth.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/pages/front_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import 'account_info_page.dart';
+
 Future<void> signOut(BuildContext context) async {
   await Auth().signOut();
   Navigator.pushReplacementNamed(context, FrontPage.id);
@@ -19,7 +22,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final DatabaseService _databaseService = DatabaseService();
-  int _currentIndex = 3;
+  int _currentIndex = 2;
   String? userStatus = 'User';
   String? userName = 'User';
 
@@ -39,6 +42,158 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  void _showBecomeHelperDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Become a Helper'),
+          content: const Text('Are you sure you want to be a helper?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirm'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showHelperForm();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelperForm() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController storeNameController =
+            TextEditingController();
+        final TextEditingController categoryController =
+            TextEditingController();
+        String selectedServiceType = 'F&B';
+        final List<String> serviceTypes = [
+          'F&B',
+          'Education',
+          'Domestics',
+          'Vehicles'
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Helper Form'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  DropdownButtonFormField<String>(
+                    value: selectedServiceType,
+                    decoration: const InputDecoration(
+                      labelText: 'Service Type',
+                    ),
+                    items: serviceTypes.map((String serviceType) {
+                      return DropdownMenuItem<String>(
+                        value: serviceType,
+                        child: Text(serviceType),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedServiceType = newValue!;
+                      });
+                    },
+                  ),
+                  TextField(
+                    controller: storeNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Store Name',
+                    ),
+                  ),
+                  TextField(
+                    controller: categoryController,
+                    decoration: const InputDecoration(
+                      labelText: 'Category',
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Submit'),
+                  onPressed: () async {
+                    final User? user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      String prefix;
+                      switch (selectedServiceType) {
+                        case 'F&B':
+                          prefix = 'FNB';
+                          break;
+                        case 'Education':
+                          prefix = 'EDU';
+                          break;
+                        case 'Domestics':
+                          prefix = 'DOM';
+                          break;
+                        case 'Vehicles':
+                          prefix = 'VEH';
+                          break;
+                        default:
+                          prefix = 'GEN';
+                      }
+
+                      // Update user status to helper
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .update({'status': 'Helper'});
+
+                      // Add helper entry to fnbLists collection
+                      await FirebaseFirestore.instance
+                          .collection('fnbLists')
+                          .add({
+                        'ID': '$prefix${DateTime.now().millisecondsSinceEpoch}',
+                        'Name': storeNameController.text,
+                        'Owner': user.uid,
+                        'Category': categoryController.text,
+                        'Rating': 0.0,
+                        'Raters': 0,
+                        'Rate_1': 0,
+                        'Rate_2': 0,
+                        'Rate_3': 0,
+                        'Rate_4': 0,
+                        'Rate_5': 0,
+                        'Icon':
+                            'https://drive.usercontent.google.com/download?id=1YH1ek_Zo6bNo74so1Nr5c4KQRkoPQjIx',
+                        'open': false,
+                      });
+
+                      setState(() {
+                        userStatus = 'Helper';
+                      });
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -83,11 +238,10 @@ class _AccountPageState extends State<AccountPage> {
           ),
           const SizedBox(height: 20),
           StreamBuilder<Object>(
-            stream: null,
-            builder: (context, snapshot) {
-              return Center(child: Text(userName ?? 'Loading...'));
-            }
-          ),
+              stream: null,
+              builder: (context, snapshot) {
+                return Center(child: Text(userName ?? 'Loading...'));
+              }),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -107,15 +261,14 @@ class _AccountPageState extends State<AccountPage> {
                 },
               ),
               // Joined Us
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                leading: const Icon(Icons.group_add),
-                title: const Text('Become a Helper'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  // Add your action here
-                },
-              ),
+              if (userStatus != 'Helper')
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  leading: const Icon(Icons.group_add),
+                  title: const Text('Become a Helper'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: _showBecomeHelperDialog,
+                ),
               // Settings
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
