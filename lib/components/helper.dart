@@ -286,7 +286,7 @@ class PopularItems extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "Total sales: ${item['total']}",
+                            "Total sales: ${item['total'].toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 8,
                             ),

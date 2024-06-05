@@ -525,7 +525,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Total Price: RM$subtotal',
+                    'Total Price: RM${subtotal.toStringAsFixed(2)}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 20),
@@ -545,7 +545,8 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                         title: Text(
                             '${items[index].name} x ${items[index].quantity}'),
                         subtitle: Text('[${items[index].foodId}]'),
-                        trailing: Text('RM ${items[index].subtotal}'),
+                        trailing: Text(
+                            'RM ${items[index].subtotal.toStringAsFixed(2)}'),
                       );
                     },
                   ),
