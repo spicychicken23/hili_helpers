@@ -700,81 +700,104 @@ class DatabaseService {
     }
   }
 
-  /*
-  Future<void> updateFnbRating(String shopId) async {
-    try {
-      QuerySnapshot cartSnapshot =
-          await _cartListsRef.where('shop_Id', isEqualTo: shopId).get();
-
-      // Iterate through each cart item to calculate rates and total raters
-      for (var doc in cartSnapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-
-        int rated = data['Rated'] ?? 0;
-        print(rated);
-
-        // Update rates based on rated value
-        switch (rated) {
-          case 1:
-            rate1++;
-            break;
-          case 2:
-            rate2++;
-            break;
-          case 3:
-            rate3++;
-            break;
-          case 4:
-            rate4++;
-            break;
-          case 5:
-            rate5++;
-            break;
-          default:
-            break;
-        }
-      }
-      print(totalRaters);
-
-      // Calculate total raters
-      totalRaters = rate1 + rate2 + rate3 + rate4 + rate5;
-      // Calculate average rating
-      double rating = totalRaters != 0
-          ? (rate1 + rate2 * 2 + rate3 * 3 + rate4 * 4 + rate5 * 5) /
-              totalRaters
-          : 0;
-
-      //2 decimal point only
-      rating.toStringAsFixed(2);
-
-      // Update FnbList with calculated rates and rating
-      QuerySnapshot fnbListSnapshot =
-          await _fnbListsRef.where('ID', isEqualTo: shopId).get();
-      if (fnbListSnapshot.docs.isNotEmpty) {
-        String fnbDocId = fnbListSnapshot.docs.first.id;
-
-        // Update FnbList with calculated rates and rating
-        await _fnbListsRef.doc(fnbDocId).update({
-          'Rate_1': rate1,
-          'Rate_2': rate2,
-          'Rate_3': rate3,
-          'Rate_4': rate4,
-          'Rate_5': rate5,
-          'Raters': totalRaters,
-          'Rating': rating,
-        });
-        print('passed4');
-      } else {
-        print('Error: No FnbList document found with shopId: $shopId');
-      }
-    } catch (error) {
-      print('Error updating FnbList: $error');
-      throw error;
-    }
-  }
-*/
   Future<String?> getUserEmail() async {
     User? user = FirebaseAuth.instance.currentUser;
     return user?.email;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchItemsByRandomId(int id) async {
+    String randomId = id.toString();
+    List<Map<String, dynamic>> items = [];
+    print(id);
+    try {
+      Query<Map<String, dynamic>> itemsCollection =
+          FirebaseFirestore.instance.collection('Items');
+
+      QuerySnapshot querySnapshot = await itemsCollection.get();
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        String docId = doc.id;
+        List<String> idParts = docId.split('_');
+        if (idParts.length > 1 && idParts[1] == randomId) {
+          String itemName = doc['itemName'];
+          int quantity = doc['quantity'];
+          items.add({'itemName': itemName, 'quantity': quantity});
+        }
+      }
+
+      if (items.isEmpty) {
+        print('No items found for the given randomId');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
+    }
+
+    return items;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCustomersById(String id) async {
+    List<Map<String, dynamic>> customerInfo = [];
+    try {
+      CollectionReference itemsCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      QuerySnapshot querySnapshot = await itemsCollection
+          .where(FieldPath.documentId, isEqualTo: id)
+          .get();
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        String address = doc['address'];
+        String phoneNumber = doc['phoneNumber'];
+        String name = doc['name'];
+
+        customerInfo.add(
+            {'address': address, 'phoneNumber': phoneNumber, 'name': name});
+      }
+
+      if (customerInfo.isEmpty) {
+        throw Exception('No items found for the given customerId');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
+    }
+
+    return customerInfo;
+  }
+
+  Stream<List<cart>> getOrders() {
+    String? userId = _auth.currentUser?.uid;
+
+    return _firestore
+        .collection('fnbLists')
+        .where('Owner', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((querySnapshot) async {
+      if (querySnapshot.docs.isEmpty) {
+        return [];
+      }
+      String shopId = querySnapshot.docs.first['ID'];
+
+      QuerySnapshot ordersSnapshot = await _cartListsRef
+          .where('shop_Id', isEqualTo: shopId)
+          .where('status', isEqualTo: 'On Going')
+          .get();
+
+      return ordersSnapshot.docs.map((doc) {
+        return cart.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
+  Future<void> updateStatus(String id) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('CartList')
+        .where('cart_Id', isEqualTo: id)
+        .get();
+
+    DocumentSnapshot document = querySnapshot.docs.first;
+    await FirebaseFirestore.instance
+        .collection('CartList')
+        .doc(document.id)
+        .update({'status': 'Completed'});
   }
 }

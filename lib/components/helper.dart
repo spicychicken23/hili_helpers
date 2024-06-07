@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/services.dart';
+import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/menu.dart';
+import 'package:hili_helpers/pages/helper_orders_page.dart';
 import 'package:hili_helpers/pages/helper_stocks_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
+import 'package:intl/intl.dart';
 
 class Selected extends StatefulWidget {
   final IconData icon;
@@ -93,7 +97,12 @@ class _HelperNaviBarState extends State<HelperNaviBar> {
             icon: Icons.bar_chart_rounded,
             label: "Orders",
             isEnd: 'Left',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelperOrdersPage()),
+              );
+            },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
@@ -583,5 +592,160 @@ class _ItemStatusState extends State<ItemStatus> {
         },
       ),
     );
+  }
+}
+
+class ordersActive extends StatelessWidget {
+  const ordersActive({
+    Key? key,
+    required this.order,
+    required this.databaseService,
+    double? rating,
+  }) : super(key: key);
+
+  final cart order;
+  final DatabaseService databaseService;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () async {
+              List<Map<String, dynamic>> customerDetails =
+                  await DatabaseService()
+                      .fetchCustomersById(order.customer_Id!);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Customer Details'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: customerDetails.map((detail) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Name: ${detail['name']}'),
+                            const SizedBox(height: 20),
+                            Text('Address: ${detail['address']}'),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text('Phone: ${detail['phoneNumber']}'),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    actions: [
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              DatabaseService().updateStatus(order.cart_Id!);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Complete',
+                                style: TextStyle(color: Colors.green)),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Close',
+                                style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+            child: ListTile(
+              leading: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: AssetImage(_getIcon(order.order_date)),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              title: Text(
+                order.order_date.toDate().toString(),
+                style: const TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+              subtitle: FutureBuilder<List<Map<String, dynamic>>>(
+                future: databaseService.fetchItemsByRandomId(order.randomId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text(
+                      'No items found',
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }
+                  List<Map<String, dynamic>> items = snapshot.data!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: items.map((item) {
+                      return Text(
+                        '${item['itemName']} - ${item['quantity']}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+              trailing: Text(
+                'RM ${order.subtotal.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 8,
+                ),
+              ),
+            ),
+          ),
+          const Divider(
+            thickness: 1,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _getIcon(Timestamp date) {
+  Timestamp now = Timestamp.now();
+
+  DateTime dateTime = date.toDate();
+  DateTime nowDateTime = now.toDate();
+
+  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+  String formattedNowDate = DateFormat('yyyy-MM-dd').format(nowDateTime);
+
+  if (formattedDate == formattedNowDate) {
+    return 'lib/images/On Going.png';
+  } else if (dateTime.isAfter(nowDateTime)) {
+    return 'lib/images/Upcoming.png';
+  } else {
+    return 'lib/images/Missed.png';
   }
 }

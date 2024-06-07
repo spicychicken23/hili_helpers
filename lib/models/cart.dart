@@ -9,6 +9,8 @@ class cart {
   String status;
   double subtotal;
   int randomId;
+  String? customer_Id;
+  String? cart_Id;
 
   cart({
     required this.items,
@@ -18,6 +20,8 @@ class cart {
     required this.status,
     required this.subtotal,
     required this.randomId,
+    this.customer_Id,
+    this.cart_Id,
   });
 
   cart.fromJson(Map<String, dynamic> json)
@@ -29,6 +33,8 @@ class cart {
           status: json['status'] as String,
           subtotal: json['total'] as double,
           randomId: json['random-Id'] as int,
+          customer_Id: json['customer_Id'] as String,
+          cart_Id: json['cart_Id'] as String,
         );
 
   Map<String, dynamic> toJson() {
