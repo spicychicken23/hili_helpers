@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
+import 'package:hili_helpers/models/search.dart';
 import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/models/cart_item.dart';
@@ -30,6 +31,62 @@ class DatabaseService {
         .map((querySnapshot) => querySnapshot.docs.map((doc) {
               return Promo.fromJson(doc.data() as Map<String, dynamic>);
             }).toList());
+  }
+
+  Future<fnb?> fetchFnbByShopId(String shopId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('fnbLists')
+          .where('ID', isEqualTo: shopId)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        return fnb.fromJson(doc.data() as Map<String, Object?>);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching fnb: $e');
+      return null;
+    }
+  }
+
+  List<Shop> fetchSpecificSearchTerms(String type) {
+    List<Shop> shops = [];
+    FirebaseFirestore.instance
+        .collection('fnbLists')
+        .where('ID', isGreaterThanOrEqualTo: type)
+        .where('ID', isLessThan: type + '\uf8ff')
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        String name = doc.data()['Name'];
+        String id = doc.data()['ID'];
+        shops.add(Shop(name: name, id: id));
+      }
+    }).catchError((error) {
+      print("Error fetching search terms from Firestore: $error");
+    });
+    return shops;
+  }
+
+  List<Shop> fetchSearchTerms() {
+    List<Shop> shops = [];
+    FirebaseFirestore.instance
+        .collection('fnbLists')
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        String name = doc.data()['Name'];
+        String id = doc.data()['ID'];
+        shops.add(Shop(name: name, id: id));
+      }
+    }).catchError((error) {
+      print("Error fetching search terms from Firestore: $error");
+    });
+    return shops;
   }
 
   Stream<List<fnb>> getFnbLists(String type) {

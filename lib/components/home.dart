@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/models/promo.dart';
+import 'package:hili_helpers/models/search.dart';
 import 'package:hili_helpers/pages/services_details_page.dart';
+import 'package:hili_helpers/services/database_service.dart';
 import '../models/servicesLists.dart';
 
 Widget accBtn(
@@ -65,31 +66,13 @@ class NewsPromo extends StatelessWidget {
   const NewsPromo({super.key, required this.promo, this.fnbs});
   final Promo promo;
   final fnb? fnbs;
-  Future<fnb?> fetchFnbByShopId(String shopId) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('fnbLists')
-          .where('ID', isEqualTo: shopId)
-          .limit(1)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot doc = querySnapshot.docs.first;
-        return fnb.fromJson(doc.data() as Map<String, Object?>);
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error fetching fnb: $e');
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        fnb? fetchedFnb = await fetchFnbByShopId(promo.Shop_ID);
+        fnb? fetchedFnb =
+            await DatabaseService().fetchFnbByShopId(promo.Shop_ID);
         if (fetchedFnb != null) {
           String pageType = promo.Shop_ID.substring(0, 3);
           Navigator.push(
@@ -132,6 +115,120 @@ class NewsPromo extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class CustomSearchBar extends SearchDelegate {
+  List<Shop> searchTerms = DatabaseService().fetchSearchTerms();
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder<List<Shop>>(
+      future: fetchFilteredShops(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Shop> matchQuery = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: matchQuery.length,
+            itemBuilder: (context, index) {
+              var result = matchQuery[index];
+              return GestureDetector(
+                onTap: () async {
+                  fnb? fetchedFnb =
+                      await DatabaseService().fetchFnbByShopId(result.id);
+                  String pageType = result.id.substring(0, 3);
+                  if (fetchedFnb != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FnbDetailsPage(Fnb: fetchedFnb, pageType: pageType),
+                      ),
+                    );
+                  }
+                },
+                child: ListTile(
+                  title: Text(result.name),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Future<List<Shop>> fetchFilteredShops(String query) async {
+    List<Shop> filteredShops = searchTerms
+        .where((shop) => shop.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    return filteredShops;
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return FutureBuilder<List<Shop>>(
+      future: fetchFilteredShops(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Shop> matchQuery = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: matchQuery.length,
+            itemBuilder: (context, index) {
+              var result = matchQuery[index];
+              return GestureDetector(
+                onTap: () async {
+                  fnb? fetchedFnb =
+                      await DatabaseService().fetchFnbByShopId(result.id);
+                  String pageType = result.id.substring(0, 3);
+                  if (fetchedFnb != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FnbDetailsPage(Fnb: fetchedFnb, pageType: pageType),
+                      ),
+                    );
+                  }
+                },
+                child: ListTile(
+                  title: Text(result.name),
+                ),
+              );
+            },
+          );
+        }
+      },
     );
   }
 }

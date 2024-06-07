@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/models/cart.dart';
+import 'package:hili_helpers/models/search.dart';
 import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/pages/services_details_page.dart';
@@ -597,4 +598,123 @@ Widget ratingBar(String label, double value) {
       ),
     ],
   );
+}
+
+class SpecificSearchBar extends SearchDelegate {
+  SpecificSearchBar({Key? key, required this.shopType}) {
+    searchTerms = DatabaseService().fetchSpecificSearchTerms(shopType);
+  }
+
+  final String shopType;
+  late List<Shop> searchTerms;
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder<List<Shop>>(
+      future: fetchFilteredShops(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Shop> matchQuery = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: matchQuery.length,
+            itemBuilder: (context, index) {
+              var result = matchQuery[index];
+              return GestureDetector(
+                onTap: () async {
+                  fnb? fetchedFnb =
+                      await DatabaseService().fetchFnbByShopId(result.id);
+                  String pageType = result.id.substring(0, 3);
+                  if (fetchedFnb != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FnbDetailsPage(Fnb: fetchedFnb, pageType: pageType),
+                      ),
+                    );
+                  }
+                },
+                child: ListTile(
+                  title: Text(result.name),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Future<List<Shop>> fetchFilteredShops(String query) async {
+    List<Shop> filteredShops = searchTerms
+        .where((shop) => shop.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    return filteredShops;
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return FutureBuilder<List<Shop>>(
+      future: fetchFilteredShops(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<Shop> matchQuery = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: matchQuery.length,
+            itemBuilder: (context, index) {
+              var result = matchQuery[index];
+              return GestureDetector(
+                onTap: () async {
+                  fnb? fetchedFnb =
+                      await DatabaseService().fetchFnbByShopId(result.id);
+                  String pageType = result.id.substring(0, 3);
+                  if (fetchedFnb != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FnbDetailsPage(Fnb: fetchedFnb, pageType: pageType),
+                      ),
+                    );
+                  }
+                },
+                child: ListTile(
+                  title: Text(result.name),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
 }

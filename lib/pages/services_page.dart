@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hili_helpers/components/home.dart';
 import 'package:hili_helpers/components/services.dart';
 import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/services/database_service.dart';
@@ -128,51 +129,39 @@ class _FnbPageState extends State<FnbPage> {
                         bottomRight: Radius.circular(15),
                       ),
                     ),
-                    child: Center(
-                      child: DecoratedBox(
-                        decoration: const BoxDecoration(
+                    child: IconButton(
+                      onPressed: () {
+                        showSearch(
+                          context: context,
+                          delegate: SpecificSearchBar(shopType: pageType!),
+                        );
+                      },
+                      icon: const DecoratedBox(
+                        decoration: BoxDecoration(
                           color: Color.fromRGBO(244, 243, 243, 1),
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(20),
                             bottom: Radius.circular(20),
                           ),
                         ),
-                        child: Row(
-                          children: <Widget>[
-                            const Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 15),
-                                  border: InputBorder.none,
-                                  hintText: "What's on your mind?",
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 15,
-                                    fontFamily: 'Roboto',
-                                  ),
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                'Get assistance now!',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'DM Sans',
                                 ),
                               ),
-                            ),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF0C171D),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(15),
-                                      bottomRight: Radius.circular(
-                                        15,
-                                      )),
-                                ),
-                                child: const Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                ),
+                              Spacer(),
+                              Icon(
+                                Icons.search,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
