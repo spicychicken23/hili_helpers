@@ -38,6 +38,106 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {});
   }
 
+  Future<void> _deleteAccount() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        // Delete user data from Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .delete();
+
+        // Delete the user authentication account
+        await user.delete();
+
+        // Sign out the user and navigate to the front page
+        await signOut(context);
+      } catch (e) {
+        // Handle errors
+        print("Error deleting account: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting account: $e')),
+        );
+      }
+    }
+  }
+
+  void _finalDeleteConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete Account'),
+          content: const Text(
+              'Are you absolutely sure you want to delete your account? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteAccount();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteAccount() {
+    TextEditingController _confirmationController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                  'Please type "delete" to confirm account deletion. This action cannot be undone.'),
+              TextField(
+                controller: _confirmationController,
+                decoration: const InputDecoration(
+                  hintText: 'delete',
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirm'),
+              onPressed: () {
+                if (_confirmationController.text.toLowerCase() == 'delete') {
+                  Navigator.of(context).pop();
+                  _finalDeleteConfirmation();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Confirmation text does not match.')),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
@@ -278,6 +378,14 @@ class _AccountPageState extends State<AccountPage> {
                 onTap: () {
                   // Add your action here
                 },
+              ),
+              // Delete Account
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: const Icon(Icons.delete_forever),
+                title: const Text('Delete Account'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: _confirmDeleteAccount,
               ),
             ],
           ),
