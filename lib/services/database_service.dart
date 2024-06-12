@@ -853,4 +853,52 @@ class DatabaseService {
         .doc(document.id)
         .update({'status': 'Completed'});
   }
+
+  Future<void> updateShopName(String shopId, String newName) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _fnbListsRef.where('ID', isEqualTo: shopId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+        String docId = docSnapshot.id;
+
+        await _fnbListsRef.doc(docId).update({
+          'Name': newName,
+        });
+      } else {
+        print('No shop found with ID: $shopId');
+      }
+    } catch (error) {
+      print('Error updating shop name: $error');
+      throw error;
+    }
+  }
+
+  Future<void> deleteShop(String shopId) async {
+    try {
+      // Step 1: Delete shop details from fnbLists collection
+      await _firestore.collection('fnbLists').doc(shopId).delete();
+
+      // Step 2: Delete menu items associated with the shop from Menu collection
+      QuerySnapshot menuItemsSnapshot = await _firestore
+          .collection('Menu')
+          .where('ID', isEqualTo: shopId)
+          .get();
+
+      // Step 3: Delete each menu item document
+      if (menuItemsSnapshot.docs.isNotEmpty) {
+        WriteBatch batch = _firestore.batch();
+        menuItemsSnapshot.docs.forEach((doc) {
+          batch.delete(doc.reference);
+        });
+        await batch.commit();
+      }
+
+      print('Shop and associated menu items deleted successfully.');
+    } catch (error) {
+      print('Error deleting shop: $error');
+      throw error;
+    }
+  }
 }
