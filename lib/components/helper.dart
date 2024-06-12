@@ -1,5 +1,10 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'dart:js';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hili_helpers/components/services.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/menu.dart';
@@ -139,7 +144,7 @@ class _shopStatusState extends State<shopStatus> {
   void initState() {
     super.initState();
     _fetchShopStatus();
-  }
+    }
 
   Future<void> _fetchShopStatus() async {
     bool? shopStatus = await DatabaseService().getShopStatus();
@@ -404,7 +409,7 @@ class ShopRatings extends StatelessWidget {
 }
 
 class StocksListing extends StatelessWidget {
-  const StocksListing({
+  StocksListing({
     Key? key,
     required this.menu,
     required this.shopId,
@@ -412,6 +417,7 @@ class StocksListing extends StatelessWidget {
 
   final Menu menu;
   final String shopId;
+  final DatabaseService _databaseService = DatabaseService();
 
   void _deleteStock(BuildContext context) {
     DatabaseService().deleteStock(menu.ID);
@@ -421,6 +427,140 @@ class StocksListing extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _editStock (BuildContext context) async{
+    print(menu.ID); 
+    // print(_databaseService.fetchMenuItemDataByShopId(menu.Shop_ID)); NOTES HERE
+    // whenever try to call the firestoredatabase make sure call it in await statement 
+    Map<String, dynamic>? listMenu = await _databaseService.fetchMenuItemDataByShopId(menu.ID);
+    
+    print(listMenu);
+    if (listMenu != null) {
+      showDialog(context: context, builder: (context){
+      TextEditingController descriptionController = TextEditingController(text: listMenu['Description']);
+      TextEditingController idController = TextEditingController(text: listMenu['ID']);
+      TextEditingController iconController = TextEditingController(text: listMenu['Icon']);
+      TextEditingController nameController = TextEditingController(text: listMenu['Name']);
+      TextEditingController priceController = TextEditingController(text: listMenu['Price'].toString());
+      TextEditingController shopIdController = TextEditingController(text: listMenu['Shop_ID']);
+      TextEditingController inStockController = TextEditingController(text: listMenu['inStock'].toString());
+
+      return AlertDialog(
+        title: Center(child: Text('Edit Stock',style:TextStyle(color: Colors.black,fontWeight:FontWeight.bold))),
+        
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+              ),
+              TextField(
+                style: TextStyle(),
+                controller: idController,
+                decoration: InputDecoration(labelText: 'ID'),
+              ),
+              TextField(
+                controller: iconController,
+                decoration: InputDecoration(labelText: 'Icon'),
+              ),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: InputDecoration(labelText: 'Price'),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+              ),
+              TextField(
+                controller: shopIdController,
+                decoration: InputDecoration(labelText: 'Shop ID'),
+                readOnly: true,
+              ),
+              TextField(
+                controller: inStockController,
+                readOnly: true,
+                decoration: InputDecoration(labelText: 'In Stock',
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    'true/false only',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),))
+                ),
+                
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: (){
+            Navigator.of(context).pop();
+          }, 
+          child: Text('Cancel',style: TextStyle(color: Colors.red),),
+          ),
+          TextButton(onPressed: () async {
+            //save action here
+            Map<String, dynamic> updatedData = {
+                  'Description': descriptionController.text,
+                  'ID': idController.text,
+                  'Icon': iconController.text,
+                  'Name': nameController.text,
+                  'Price': double.tryParse(priceController.text) ?? 0,
+                  'Shop_ID': shopIdController.text,
+                  'inStock': bool.tryParse(inStockController.text) ?? 0,
+                };
+
+                // Call the updateMenuItem function
+                await _databaseService.updateMenuItem(listMenu['ID'], updatedData);
+                // Close the dialog
+                Navigator.of(context).pop();
+          }, 
+          child: Text('Save',style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),),
+          ),
+        ],
+      );
+      },
+      );
+    // Use the controllers as needed
+  } else {
+    // Handle the case where no data was found or an error occurred
+    print('No data found for Shop_ID: ${menu.Shop_ID}');
+  }
+  }
+
+  void _confirmEdit(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Edit'),
+          content: const Text('Are you sure you want to edit this stock?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel',
+              style:TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _editStock(context);
+              },
+              child: const Text('Edit', 
+              style:TextStyle(color: Colors.black,fontWeight:FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   void _confirmDelete(BuildContext context) {
     showDialog(
@@ -463,7 +603,7 @@ class StocksListing extends StatelessWidget {
           children: [
             Row(children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () => _confirmEdit(context),
                 child: const DecoratedBox(
                   decoration: BoxDecoration(
                     color: Color(0xFFdbc1ac),
