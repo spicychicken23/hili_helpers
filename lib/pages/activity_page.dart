@@ -1,12 +1,8 @@
-//working fine but less attractive
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/activity.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/navigation.dart';
-import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 import 'package:intl/intl.dart';
 
@@ -22,7 +18,6 @@ class _ActPageState extends State<ActPage> {
   int _currentIndex = 1;
   final DatabaseService _databaseService = DatabaseService();
   double? globalRated;
-  
 
   void _onPageChanged(int index) {
     setState(() {
@@ -54,9 +49,9 @@ class _ActPageState extends State<ActPage> {
         // Format the total with 2 decimal places
         String formattedTotal = order.subtotal.toStringAsFixed(2);
         // Format the order date to display only minutes
-        String formattedOrderDate = DateFormat('yyyy-MM-dd HH:mm').format(order.order_date.toDate());
+        String formattedOrderDate =
+            DateFormat('yyyy-MM-dd HH:mm').format(order.order_date.toDate());
         double rating = 0; // initial rating
-
 
         return AlertDialog(
           title: const Text(
@@ -64,8 +59,7 @@ class _ActPageState extends State<ActPage> {
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
           ),
-          content: 
-            FutureBuilder<String?>(
+          content: FutureBuilder<String?>(
             future: DatabaseService().getShopName(order.shop_Id),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -86,7 +80,8 @@ class _ActPageState extends State<ActPage> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
                         '${shopName}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -106,7 +101,8 @@ class _ActPageState extends State<ActPage> {
                     const SizedBox(height: 8),
                     Text(
                       'Total : RM$formattedTotal',
-                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Colors.green, fontWeight: FontWeight.bold),
                     ),
                     if (isHistory) ...[
                       const SizedBox(height: 8),
@@ -115,23 +111,25 @@ class _ActPageState extends State<ActPage> {
                       FutureBuilder<double?>(
                         future: _databaseService.getRate(order.randomId),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error fetching rating');
                           } else {
-                          //rated is Rated value retrieve from the current database
-                          //rating is just a initial value
-                          //globalRated is used for outside method
-                          double? rated = snapshot.data;
-                          globalRated = rated ?? 0;
+                            //rated is Rated value retrieve from the current database
+                            //rating is just a initial value
+                            //globalRated is used for outside method
+                            double? rated = snapshot.data;
+                            globalRated = rated ?? 0;
                             if (rated == null) {
                               return Column(
                                 children: [
                                   const Text(
                                     'Rate the Seller:',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 8),
                                   Row(
@@ -139,16 +137,19 @@ class _ActPageState extends State<ActPage> {
                                     children: List.generate(5, (index) {
                                       return IconButton(
                                         icon: Icon(
-                                          index < rating ? Icons.star : Icons.star_border,
+                                          index < rating
+                                              ? Icons.star
+                                              : Icons.star_border,
                                           color: Colors.amber,
                                         ),
                                         onPressed: () {
                                           setState(() {
                                             rating = index + 1;
                                           });
-                                          _databaseService.rateOrder(order.randomId, index + 1);
-                                          _databaseService.updateFnbRating(order.shop_Id);
-                                          //update fnbLists rate dengan based on the rate the 
+                                          _databaseService.rateOrder(
+                                              order.randomId, index + 1);
+                                          //_databaseService.updateFnbRating(order.shop_Id);
+                                          //update fnbLists rate dengan based on the rate the
                                           //loop - switch (rating ) Rate_4++
                                           //
                                         },
@@ -158,20 +159,21 @@ class _ActPageState extends State<ActPage> {
                                   const Text(
                                     'Notes: Make Sure Double Click the Star',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize:10,),
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               );
                             } else {
-
                               return Text(
-                              "You've rated $rated/5.",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            );
+                                "You've rated $rated/5.",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              );
                             }
                           }
                         },
@@ -259,7 +261,8 @@ class _ActPageState extends State<ActPage> {
                             itemBuilder: (context, index) {
                               final order = snapshot.data![index];
                               return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 child: GestureDetector(
                                   onTap: () {
                                     _showOrderDetails(context, order, false);

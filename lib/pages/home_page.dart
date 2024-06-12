@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               const SizedBox(height: 50),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
                   'Welcome, $userName.',
                   style: const TextStyle(
@@ -75,90 +75,54 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 25),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF5983B1),
-                        Color(0xFF2367B1),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: IconButton(
+                  onPressed: () {
+                    showSearch(
+                      context: context,
+                      delegate: CustomSearchBar(),
+                    );
+                  },
+                  icon: Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF5983B1),
+                          Color(0xFF2367B1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(15),
+                        bottom: Radius.circular(15),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(20.0),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Get assistance now!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'DM Sans',
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFFFFFF),
+                          ),
+                        ),
+                        Spacer(),
+                        Icon(
+                          Icons.search,
+                          color: Color(0xFFFFFFFF),
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                      bottom: Radius.circular(20),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const Text(
-                        'Get assistance now!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: 'DM Sans',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(244, 243, 243, 1),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            const Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 15),
-                                  border: InputBorder.none,
-                                  hintText: "What's on your mind?",
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 15,
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF0C171D),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(15),
-                                      bottomRight: Radius.circular(
-                                        15,
-                                      )),
-                                ),
-                                child: const Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
                   ),
                 ),
               ),
               const SizedBox(
-                height: 30,
+                height: 25,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Container(
-                      height: 160,
+                      height: 240,
                       child: StreamBuilder<List<Promo>>(
                         stream: promosStream,
                         builder: (context, snapshot) {

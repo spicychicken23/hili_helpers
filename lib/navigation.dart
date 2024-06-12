@@ -39,11 +39,9 @@ class CustomNavigationBar extends StatelessWidget {
             Navigator.pushNamed(context, ActPage.id);
             break;
           case 2:
-            break;
-          case 3:
             Navigator.pushNamed(context, AccountPage.id);
             break;
-          case 4:
+          case 3:
             Navigator.pushNamed(context, HelperPage.id);
             break;
           default:
@@ -67,10 +65,6 @@ class CustomNavigationBar extends StatelessWidget {
         const BottomNavigationBarItem(
           label: 'Activity',
           icon: Icon(Icons.library_books),
-        ),
-        const BottomNavigationBarItem(
-          label: 'Notification',
-          icon: Icon(Icons.notifications),
         ),
         const BottomNavigationBarItem(
           label: 'Account',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/helper.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/services/database_service.dart';
-import 'add_menuitem.dart';
+import 'helper_addmenu.dart';
 
 class HelperStocksPage extends StatefulWidget {
   HelperStocksPage({super.key});

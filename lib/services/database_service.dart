@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
+import 'package:hili_helpers/models/search.dart';
 import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/models/menu.dart';
 import 'package:hili_helpers/models/cart_item.dart';
@@ -30,6 +31,62 @@ class DatabaseService {
         .map((querySnapshot) => querySnapshot.docs.map((doc) {
               return Promo.fromJson(doc.data() as Map<String, dynamic>);
             }).toList());
+  }
+
+  Future<fnb?> fetchFnbByShopId(String shopId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('fnbLists')
+          .where('ID', isEqualTo: shopId)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        return fnb.fromJson(doc.data() as Map<String, Object?>);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching fnb: $e');
+      return null;
+    }
+  }
+
+  List<Shop> fetchSpecificSearchTerms(String type) {
+    List<Shop> shops = [];
+    FirebaseFirestore.instance
+        .collection('fnbLists')
+        .where('ID', isGreaterThanOrEqualTo: type)
+        .where('ID', isLessThan: type + '\uf8ff')
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        String name = doc.data()['Name'];
+        String id = doc.data()['ID'];
+        shops.add(Shop(name: name, id: id));
+      }
+    }).catchError((error) {
+      print("Error fetching search terms from Firestore: $error");
+    });
+    return shops;
+  }
+
+  List<Shop> fetchSearchTerms() {
+    List<Shop> shops = [];
+    FirebaseFirestore.instance
+        .collection('fnbLists')
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        String name = doc.data()['Name'];
+        String id = doc.data()['ID'];
+        shops.add(Shop(name: name, id: id));
+      }
+    }).catchError((error) {
+      print("Error fetching search terms from Firestore: $error");
+    });
+    return shops;
   }
 
   Stream<List<fnb>> getFnbLists(String type) {
@@ -560,28 +617,64 @@ class DatabaseService {
   }
 
   Future<void> rateOrder(int cartId, double rating) async {
-  try {
-    final querySnapshot = await _cartListsRef
-        .where('random-Id', isEqualTo: cartId)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      final doc = querySnapshot.docs.first;
-      await doc.reference.update({'Rated': rating});
-    } else {
-      print('No cart found with ID: $cartId');
-    }
-  } catch (error) {
-    print('Error rating order: $error');
-    throw error;
-  }
-}
-
-  Future<void> saveRating(String orderId, double rating) async {
     try {
-      await _cartListsRef.doc(orderId).update({'Rated': rating});
-    } catch (e) {
-      print('Error saving rating: $e');
+      final querySnapshot =
+          await _cartListsRef.where('random-Id', isEqualTo: cartId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+        await doc.reference.update({'Rated': rating});
+        final String shopID = doc['shop_Id'];
+
+        final fnblistQuerySnapshot =
+            await _fnbListsRef.where('ID', isEqualTo: shopID).get();
+
+        if (fnblistQuerySnapshot.docs.isNotEmpty) {
+          final fnblistDoc = fnblistQuerySnapshot.docs.first;
+
+          final updates = {
+            'Raters': FieldValue.increment(1),
+          };
+
+          if (rating == 1) {
+            updates['Rate_1'] = FieldValue.increment(1);
+          } else if (rating == 2) {
+            updates['Rate_2'] = FieldValue.increment(1);
+          } else if (rating == 3) {
+            updates['Rate_3'] = FieldValue.increment(1);
+          } else if (rating == 4) {
+            updates['Rate_4'] = FieldValue.increment(1);
+          } else if (rating == 5) {
+            updates['Rate_5'] = FieldValue.increment(1);
+          }
+
+          await fnblistDoc.reference.update(updates);
+
+          // Fetch the updated document to get the latest counts
+          final updatedFnblistDoc = await fnblistDoc.reference.get();
+
+          final rate1 = updatedFnblistDoc['Rate_1'] ?? 0;
+          final rate2 = updatedFnblistDoc['Rate_2'] ?? 0;
+          final rate3 = updatedFnblistDoc['Rate_3'] ?? 0;
+          final rate4 = updatedFnblistDoc['Rate_4'] ?? 0;
+          final rate5 = updatedFnblistDoc['Rate_5'] ?? 0;
+          final raters = updatedFnblistDoc['Raters'] ?? 0;
+
+          if (raters > 0) {
+            final totalRating =
+                (rate1 * 1 + rate2 * 2 + rate3 * 3 + rate4 * 4 + rate5 * 5) /
+                    raters;
+            await fnblistDoc.reference.update({'Rating': totalRating});
+          }
+        } else {
+          print('No corresponding document found in fnblists with ID: $shopID');
+        }
+      } else {
+        print('No cart found with ID: $cartId');
+      }
+    } catch (error) {
+      print('Error rating order: $error');
+      throw error;
     }
   }
 
@@ -592,14 +685,14 @@ class DatabaseService {
 
       if (querySnapshot.docs.isNotEmpty) {
         var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        double? rateValue = rateData['Rated'] ;
+        double? rateValue = rateData['Rated'];
         if (rateValue != null) {
           return rateValue;
         }
       } else {
         print('No shop found with ID: $orderId');
       }
-      print ('not found');
+      print('not found');
       return null;
     } catch (error) {
       print('Error fetching shop data: $error');
@@ -607,109 +700,104 @@ class DatabaseService {
     }
   }
 
-  Future<bool> checkRate(int orderId) async {
-  try {
-    // Assuming _cartListsRef is a reference to the Firestore collection.
-    QuerySnapshot querySnapshot = await _cartListsRef
-        .where('orderId', isEqualTo: orderId)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      var rateData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-      bool? rated = rateData['Rated'];
-      if (rated != null) {
-        return true;
-      }
-    } else {
-      print('No order found with ID: $orderId');
-    }
-    print('Rating not found');
-    return false;
-  } catch (error) {
-    print('Error fetching order data: $error');
-    throw error;
-  }
-}
-
-Future<void> updateFnbRating(String shopId) async {
-    try {
-      // Get all cart items with the given shopId
-      QuerySnapshot cartSnapshot = await _cartListsRef.where('shop_Id', isEqualTo: shopId).get();
-      print('passed1');
-
-      // Initialize variables to store rates and raters
-      int rate1 = 0, rate2 = 0, rate3 = 0, rate4 = 0, rate5 = 0, totalRaters = 0;
-      print('passed1.1');
-
-      // Iterate through each cart item to calculate rates and total raters
-    for (var doc in cartSnapshot.docs) {
-      final data = doc.data() as Map<String, dynamic>;
-      print(data);  // Print document data for debugging
-
-      int rated = data['Rated'] ?? 0;
-      print(rated);
-
-        // Update rates based on rated value
-        switch (rated) {
-          case 1:
-            rate1++;
-            break;
-          case 2:
-            rate2++;
-            break;
-          case 3:
-            rate3++;
-            break;
-          case 4:
-            rate4++;
-            break;
-          case 5:
-            rate5++;
-            break;
-          default:
-            break;
-        }
-
-      }
-      print(totalRaters);
-
-       // Calculate total raters
-      totalRaters = rate1 + rate2 + rate3 + rate4 + rate5;
-      // Calculate average rating
-      double rating = totalRaters != 0 ? (rate1 + rate2 * 2 + rate3 * 3 + rate4 * 4 + rate5 * 5) / totalRaters : 0;
-
-      //2 decimal point only
-      rating.toStringAsFixed(2);
-
-      // Update FnbList with calculated rates and rating
-      QuerySnapshot fnbListSnapshot = await _fnbListsRef.where('ID', isEqualTo: shopId).get();
-      if (fnbListSnapshot.docs.isNotEmpty) {
-        String fnbDocId = fnbListSnapshot.docs.first.id;
-
-      // Update FnbList with calculated rates and rating
-        await _fnbListsRef.doc(fnbDocId).update({
-          'Rate_1': rate1,
-          'Rate_2': rate2,
-          'Rate_3': rate3,
-          'Rate_4': rate4,
-          'Rate_5': rate5,
-          'Raters': totalRaters,
-          'Rating': rating,
-      });
-      print('passed4');
-    } else {
-      print('Error: No FnbList document found with shopId: $shopId');
-    }
-  } catch (error) {
-    print('Error updating FnbList: $error');
-    throw error;
-  }
-}
   Future<String?> getUserEmail() async {
     User? user = FirebaseAuth.instance.currentUser;
     return user?.email;
   }
+
+  Future<List<Map<String, dynamic>>> fetchItemsByRandomId(int id) async {
+    String randomId = id.toString();
+    List<Map<String, dynamic>> items = [];
+    print(id);
+    try {
+      Query<Map<String, dynamic>> itemsCollection =
+          FirebaseFirestore.instance.collection('Items');
+
+      QuerySnapshot querySnapshot = await itemsCollection.get();
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        String docId = doc.id;
+        List<String> idParts = docId.split('_');
+        if (idParts.length > 1 && idParts[1] == randomId) {
+          String itemName = doc['itemName'];
+          int quantity = doc['quantity'];
+          items.add({'itemName': itemName, 'quantity': quantity});
+        }
+      }
+
+      if (items.isEmpty) {
+        print('No items found for the given randomId');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
+    }
+
+    return items;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCustomersById(String id) async {
+    List<Map<String, dynamic>> customerInfo = [];
+    try {
+      CollectionReference itemsCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      QuerySnapshot querySnapshot = await itemsCollection
+          .where(FieldPath.documentId, isEqualTo: id)
+          .get();
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        String address = doc['address'];
+        String phoneNumber = doc['phoneNumber'];
+        String name = doc['name'];
+
+        customerInfo.add(
+            {'address': address, 'phoneNumber': phoneNumber, 'name': name});
+      }
+
+      if (customerInfo.isEmpty) {
+        throw Exception('No items found for the given customerId');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
+    }
+
+    return customerInfo;
+  }
+
+  Stream<List<cart>> getOrders() {
+    String? userId = _auth.currentUser?.uid;
+
+    return _firestore
+        .collection('fnbLists')
+        .where('Owner', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((querySnapshot) async {
+      if (querySnapshot.docs.isEmpty) {
+        return [];
+      }
+      String shopId = querySnapshot.docs.first['ID'];
+
+      QuerySnapshot ordersSnapshot = await _cartListsRef
+          .where('shop_Id', isEqualTo: shopId)
+          .where('status', isEqualTo: 'On Going')
+          .get();
+
+      return ordersSnapshot.docs.map((doc) {
+        return cart.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
+  Future<void> updateStatus(String id) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('CartList')
+        .where('cart_Id', isEqualTo: id)
+        .get();
+
+    DocumentSnapshot document = querySnapshot.docs.first;
+    await FirebaseFirestore.instance
+        .collection('CartList')
+        .doc(document.id)
+        .update({'status': 'Completed'});
+  }
 }
-
-
-  

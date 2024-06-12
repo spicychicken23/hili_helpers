@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/helper.dart';
 import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/navigation.dart';
-import 'package:hili_helpers/pages/home_page.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class HelperPage extends StatefulWidget {
@@ -14,7 +13,7 @@ class HelperPage extends StatefulWidget {
 }
 
 class _HelperPageState extends State<HelperPage> {
-  int _currentIndex = 4;
+  int _currentIndex = 3;
   late String? userStatus = 'Helper';
   late double? salesData = 0;
   late int? quantitySold = 0;
