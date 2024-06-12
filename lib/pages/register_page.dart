@@ -12,7 +12,6 @@ class RegisterPage extends StatelessWidget {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
-  // Function to save user data to Firestore
   void saveUserData(BuildContext context) async {
     String name = nameController.text.trim();
     String email = emailController.text.trim();
