@@ -15,7 +15,8 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   String _itemName = '';
   String _itemDescription = '';
   double _itemPrice = 0.0;
-  final String _itemIcon = '';
+  final String _itemIcon =
+      'https://drive.usercontent.google.com/download?id=1YH1ek_Zo6bNo74so1Nr5c4KQRkoPQjIx';
   final bool _inStock = true;
   late String _generatedId;
 

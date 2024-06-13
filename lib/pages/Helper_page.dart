@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hili_helpers/components/helper.dart';
-import 'package:hili_helpers/models/servicesLists.dart';
 import 'package:hili_helpers/navigation.dart';
 import 'package:hili_helpers/services/database_service.dart';
 
 class HelperPage extends StatefulWidget {
-  HelperPage({Key? key}) : super(key: key);
+  const HelperPage({super.key});
   static String id = 'Helper_page';
 
   @override
+  // ignore: library_private_types_in_public_api
   _HelperPageState createState() => _HelperPageState();
 }
 
@@ -18,8 +18,7 @@ class _HelperPageState extends State<HelperPage> {
   double? salesData = 0;
   int? quantitySold = 0;
   int? transactionsMade = 0;
-  late fnb shop;
-  TextEditingController _shopNameController = TextEditingController();
+  final TextEditingController _shopNameController = TextEditingController();
 
   @override
   void initState() {
@@ -47,13 +46,8 @@ class _HelperPageState extends State<HelperPage> {
 
   void _editShopName() async {
     String? shopId = await DatabaseService().getHelperShopId();
-    if (shopId != null) {
-      String? currentShopName = await DatabaseService().getShopName(shopId);
-      _shopNameController.text = currentShopName ?? '';
-    } else {
-      print('Shop ID not found');
-      return;
-    }
+    String? currentShopName = await DatabaseService().getShopName(shopId);
+    _shopNameController.text = currentShopName ?? '';
 
     showDialog(
       context: context,
@@ -61,23 +55,11 @@ class _HelperPageState extends State<HelperPage> {
         return EditShopNameDialog(
           shopNameController: _shopNameController,
           onUpdateShopName: (newShopName) async {
-            if (newShopName.isNotEmpty) {
-              String? shopId = await DatabaseService().getHelperShopId();
-              if (shopId != null) {
-                print('Updating shop name to: $newShopName'); // Debug print
-                await DatabaseService().updateShopName(shopId, newShopName);
-                setState(() {
-                  // Update only the Name attribute
-                  shop.Name = newShopName;
-                });
-                Navigator.pop(context); // Close the dialog after update
-              } else {
-                print('Shop ID not found during update');
-              }
-            } else {
-              print('New shop name is empty');
-              Navigator.pop(context); // Close the dialog if the name is empty
-            }
+            String? shopId = await DatabaseService().getHelperShopId();
+            await DatabaseService().updateShopName(shopId, newShopName);
+          },
+          onCloseDialog: () {
+            Navigator.pop(context); // Close the dialog
           },
         );
       },
@@ -116,7 +98,7 @@ class _HelperPageState extends State<HelperPage> {
                     Row(
                       children: <Widget>[
                         const Text(
-                          'Helper Dashboard',
+                          'Dashboard',
                           style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: 25,
@@ -124,15 +106,14 @@ class _HelperPageState extends State<HelperPage> {
                             fontFamily: 'DM Sans',
                           ),
                         ),
+                        const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 20,
+                          ),
                           onPressed: _editShopName,
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {},
-                        ),
-                        const Spacer(),
                         const shopStatus()
                       ],
                     ),
@@ -222,10 +203,13 @@ class _HelperPageState extends State<HelperPage> {
 class EditShopNameDialog extends StatefulWidget {
   final TextEditingController shopNameController;
   final Function(String) onUpdateShopName;
+  final VoidCallback onCloseDialog; // Add this callback
 
   const EditShopNameDialog({
+    super.key,
     required this.shopNameController,
     required this.onUpdateShopName,
+    required this.onCloseDialog, // Add this parameter
   });
 
   @override
@@ -236,24 +220,22 @@ class _EditShopNameDialogState extends State<EditShopNameDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Edit Shop Name'),
+      title: const Text('Edit Shop Name'),
       content: TextField(
         controller: widget.shopNameController,
-        decoration: InputDecoration(hintText: 'Enter new shop name'),
+        decoration: const InputDecoration(hintText: 'Enter new shop name'),
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.pop(context); // Close the dialog
-          },
-          child: Text('Cancel'),
+          onPressed: widget.onCloseDialog, // Use the callback here
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
             widget.onUpdateShopName(widget.shopNameController.text);
-            Navigator.pop(context); // Close the dialog after saving
+            widget.onCloseDialog(); // Use the callback here
           },
-          child: Text('Save'),
+          child: const Text('Save'),
         ),
       ],
     );

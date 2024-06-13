@@ -725,16 +725,20 @@ class _ItemStatusState extends State<ItemStatus> {
 
   Future<void> _fetchItemStatus() async {
     bool? itemStatus = await DatabaseService().getStockStatus(widget.itemId);
-    setState(() {
-      light = itemStatus ?? false;
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        light = itemStatus ?? false;
+        isLoading = false;
+      });
+    }
   }
 
   void _toggleItemStatus(bool value) async {
-    setState(() {
-      light = value;
-    });
+    if (mounted) {
+      setState(() {
+        light = value;
+      });
+    }
     await DatabaseService().toggleStockStatus(value, widget.itemId);
   }
 

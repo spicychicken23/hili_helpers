@@ -1,7 +1,5 @@
-// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings, unnecessary_brace_in_string_interps, use_rethrow_when_possible
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:hili_helpers/models/cart.dart';
 import 'package:hili_helpers/models/promo.dart';
 import 'package:hili_helpers/models/search.dart';
