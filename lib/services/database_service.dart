@@ -1,7 +1,4 @@
 // ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings, unnecessary_brace_in_string_interps, use_rethrow_when_possible
-
-import 'dart:js';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -111,29 +108,30 @@ class DatabaseService {
   }
 
   Future<Map<String, dynamic>?> fetchMenuItemDataByShopId(String shopId) async {
-  try {
-    // Query the 'Menu' collection for documents where 'shop_id' field matches the provided shopId
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Menu')
-        .where('ID', isEqualTo: shopId)
-        .get();
+    try {
+      // Query the 'Menu' collection for documents where 'shop_id' field matches the provided shopId
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Menu')
+          .where('ID', isEqualTo: shopId)
+          .get();
 
-    // Check if any documents are found
-    if (querySnapshot.docs.isNotEmpty) {
-      DocumentSnapshot doc = querySnapshot.docs.first;
-      //print (doc.data() as Map<String, dynamic>?);
-      return doc.data() as Map<String, dynamic>?;
-    } else {
-      print('No document found with shop_id: $shopId');
+      // Check if any documents are found
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        //print (doc.data() as Map<String, dynamic>?);
+        return doc.data() as Map<String, dynamic>?;
+      } else {
+        print('No document found with shop_id: $shopId');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching document: $e');
       return null;
     }
-  } catch (e) {
-    print('Error fetching document: $e');
-    return null;
   }
-}
 
-  Future<void> updateMenuItem(String shopId, Map<String, dynamic> updatedData) async {
+  Future<void> updateMenuItem(
+      String shopId, Map<String, dynamic> updatedData) async {
     try {
       // Query the 'Menu' collection to find the document with the matching 'Shop_ID'
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
